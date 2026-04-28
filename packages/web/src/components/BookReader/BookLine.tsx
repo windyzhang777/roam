@@ -1,4 +1,4 @@
-import { useBookContext, useCommonContext, useSearchContext, useSettingContext } from '@/config/contexts';
+import { useBookContext, useCommonContext, useSearchContext, useSettingContext, useViewLineContext } from '@/config/contexts';
 import { cn } from '@/lib/utils';
 import { wordHighlightStore, type WordHighlight } from '@/stores/wordHighlightStore';
 import { CHAPTER_MARKER, DELETE_MARKER, escapeRegExp, IMAGE_MARKER, removeMarker } from '@audiobook/shared';
@@ -11,6 +11,7 @@ interface BookLineProps extends React.HTMLAttributes<HTMLLIElement> {
 
 export const BookLine = ({ index, line }: BookLineProps) => {
   const { currentLine, book, chapters, bookmarks, highlights } = useBookContext();
+  const { viewLine } = useViewLineContext();
   const { readingMode, handleLineClick } = useCommonContext();
   const { searchText, searchRes, currentMatch } = useSearchContext();
 
@@ -119,7 +120,7 @@ export const BookLine = ({ index, line }: BookLineProps) => {
       style={{ paddingTop: paragraphSpacing + 'ch', paddingBottom: paragraphSpacing + 'ch' }}
       className={cn(
         `group relative cursor-pointer my-1 px-2 transition-colors duration-200 ease-in-out rounded-lg`,
-        index === currentLine ? 'bg-highlight font-medium' : 'hover:bg-sidebar-accent',
+        index === currentLine ? 'bg-highlight font-medium' : index === viewLine ? 'bg-sidebar-accent' : 'hover:bg-sidebar-accent',
         isChapter ? 'font-semibold italic text-center uppercase tracking-widest' : '',
         isBookmarked ? 'border border-r-4 border-primary pr-2' : 'border-r-4 border-transparent',
       )}

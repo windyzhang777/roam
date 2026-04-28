@@ -46,7 +46,7 @@ export default function useBookNavigation(currentLine: number, lines: string[], 
 
   const scrollToLine = useCallback((index: number, behavior: LocationOptions['behavior'] = 'auto') => {
     console.log(`scrollToLine :`, behavior);
-    virtuosoRef.current?.scrollToIndex({ index, align: 'start', behavior });
+    virtuosoRef.current?.scrollToIndex({ index, align: 'start', behavior, offset: -100 });
   }, []);
 
   const jumpToRead = (index: number) => {

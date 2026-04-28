@@ -104,7 +104,19 @@ export const BookReader = () => {
   } = useBookNavigation(currentLine, lines, loadMoreLines);
 
   // search hook
-  const { searchInputRef, searchText, setSearchText, searchRes, currentMatch, clickMatch, prevMatch, nextMatch, openSearch, closeSearch } = useBookSearch(
+  const {
+    loading: searching,
+    searchInputRef,
+    searchText,
+    setSearchText,
+    searchRes,
+    currentMatch,
+    clickMatch,
+    prevMatch,
+    nextMatch,
+    openSearch,
+    closeSearch,
+  } = useBookSearch(
     _id,
     viewLine,
     jumpToIndex,
@@ -307,7 +319,7 @@ export const BookReader = () => {
                 <SpeechContext.Provider value={{ isPlaying, play, pause, resume: () => resume(currentLineRef.current), stop }}>
                   <div className="h-full relative">
                     <div className="flex flex-col h-full overflow-hidden">
-                      <BookHeader setOpenPanelLeft={setOpenPanelLeft} setOpenPanelRight={setOpenPanelRight} toaster={toaster} />
+                      <BookHeader searching={searching} setOpenPanelLeft={setOpenPanelLeft} setOpenPanelRight={setOpenPanelRight} />
 
                       {/* Start of Virtuoso */}
                       <Virtuoso
@@ -370,10 +382,13 @@ export const BookReader = () => {
                         line={lines[currentLine]}
                         onClick={() => {
                           jumpToRead(currentLineRef.current);
-                          if (!isPlaying) resume(currentLineRef.current);
+                          if (!isPlaying) play(currentLineRef.current);
                         }}
                       />
                     )}
+
+                    {/* Restore delete */}
+                    {toaster}
 
                     {/* Left Panel */}
                     <SidePanelLeft

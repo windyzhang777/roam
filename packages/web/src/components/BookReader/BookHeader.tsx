@@ -1,23 +1,26 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
-import { useBookContext, useCommonContext, useSearchContext, useViewLineContext } from '@/config/contexts';
+import { useBookContext, useCommonContext, useContentContext, useSearchContext, useViewLineContext } from '@/config/contexts';
 import { FEATURES } from '@/config/features';
 import { bookTitleWithAuthor } from '@audiobook/shared';
-import { ArrowBigDown, ArrowBigUp, LibraryBig, ListEnd, ListStart, PanelLeft, Search, Settings, X } from 'lucide-react';
+import { ArrowBigDown, ArrowBigUp, Bookmark, LibraryBig, ListEnd, ListStart, Loader, PanelLeft, Search, Settings, X } from 'lucide-react';
 import { type SetStateAction } from 'react';
 
 interface BookHeaderProps {
+  searching: boolean;
   setOpenPanelLeft: (value: SetStateAction<boolean>) => void;
   setOpenPanelRight: (value: SetStateAction<boolean>) => void;
-  toaster: React.ReactNode;
 }
 
-export const BookHeader = ({ setOpenPanelLeft, setOpenPanelRight, toaster }: BookHeaderProps) => {
-  const { book, currentLine, chapters, viewChapter, totalLines } = useBookContext();
+export const BookHeader = ({ searching, setOpenPanelLeft, setOpenPanelRight }: BookHeaderProps) => {
+  const { book, currentLine, chapters, bookmarks, toggleBookmark, viewChapter, totalLines } = useBookContext();
   const { isPlaying, readingMode, jumpToIndex, userScroll, navigateBack } = useCommonContext();
+  const { lines } = useContentContext();
   const { viewLine } = useViewLineContext();
   const { searchInputRef, searchText, setSearchText, openSearch, closeSearch, prevMatch, nextMatch } = useSearchContext();
+  const isBookmarked = bookmarks.find((b) => currentLine === b.index);
+
   if (!book || currentLine === undefined) return null;
 
   return (
@@ -118,9 +121,6 @@ export const BookHeader = ({ setOpenPanelLeft, setOpenPanelRight, toaster }: Boo
 
         {/* Right Panel Group */}
         <div id="panel-right" title="Font & Voice" className="flex items-center gap-4">
-          {/* Restore delete */}
-          {toaster}
-
           {/* Search text */}
           <Button
             size="icon"
@@ -166,22 +166,39 @@ export const BookHeader = ({ setOpenPanelLeft, setOpenPanelRight, toaster }: Boo
                 }}
                 className="w-auto min-w-[2ch] max-w-[10ch] border-none transition-all focus:ring-0 focus-visible:ring-0"
               />
-              {searchText.length > 0 && (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  name="clear search"
-                  title="Clear search"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    closeSearch();
-                  }}
-                >
-                  <X size={14} />
-                </Button>
+
+              {searching ? (
+                <Loader className="size-8 p-2" />
+              ) : (
+                searchText.length > 0 && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    name="clear search"
+                    title="Clear search"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      closeSearch();
+                    }}
+                  >
+                    <X size={14} />
+                  </Button>
+                )
               )}
             </div>
           )}
+
+          {/* Bookmark */}
+          <Button
+            variant="ghost"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              toggleBookmark(currentLine, lines[currentLine]);
+            }}
+            title={isBookmarked ? 'Remove bookmark' : 'Bookmark'}
+          >
+            <Bookmark className={isBookmarked && 'fill-primary stroke-primary'} />
+          </Button>
 
           {/* Right Panel */}
           <Button

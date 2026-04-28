@@ -14,6 +14,7 @@ export function useBookSearch(
   const [searchText, setSearchText] = useState<string>('');
   const [searchRes, setSearchRes] = useState<SearchMatch[]>([]);
   const [currentMatch, setCurrentMatch] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -24,6 +25,7 @@ export function useBookSearch(
       return;
     }
 
+    setLoading(true);
     try {
       const { matches } = await api.books.search(id, cleanSearchText);
       setSearchRes(matches);
@@ -36,6 +38,8 @@ export function useBookSearch(
       // await jumpToIndex(indices[nearestMatchIndex]);
     } catch (error) {
       console.error('❌ Failed to search book:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,5 +113,5 @@ export function useBookSearch(
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, [clearSearch, openSearch]);
 
-  return { searchInputRef, searchText, setSearchText, searchRes, currentMatch, clickMatch, prevMatch, nextMatch, openSearch, closeSearch };
+  return { loading, searchInputRef, searchText, setSearchText, searchRes, currentMatch, clickMatch, prevMatch, nextMatch, openSearch, closeSearch };
 }

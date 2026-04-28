@@ -1,8 +1,7 @@
 import useTimer from '@/common/useTimer';
-import { useBookContext, useCommonContext, useContentContext } from '@/config/contexts';
-import { FEATURES } from '@/config/features';
+import { useBookContext, useCommonContext } from '@/config/contexts';
 import { cn } from '@/lib/utils';
-import { Bookmark, Copy, Highlighter, Trash2 } from 'lucide-react';
+import { Copy, Highlighter } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from './button';
 
@@ -18,9 +17,8 @@ export const TextContextMenu = () => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const { startTimer } = useTimer();
-  const { chapters, toggleChapter, bookmarks, toggleBookmark, highlights, toggleHighlight, deleteLine } = useBookContext();
+  const { highlights, toggleHighlight } = useBookContext();
   const { userScroll } = useCommonContext();
-  const { lines } = useContentContext();
 
   const clearSelection = useCallback(() => {
     setPosition(undefined);
@@ -71,7 +69,7 @@ export const TextContextMenu = () => {
         }
 
         // added offset so cursor isn't covering the menu
-        const MENU_HEIGHT = 120 + (FEATURES.ENABLE_CAHPTER_EDIT ? +20 : 0) + (FEATURES.ENABLE_LINE_EDIT ? +20 : 0); // Approximate height of your menu
+        const MENU_HEIGHT = 80; // Approximate height of the menu
         const MENU_WIDTH = 160;
         let x = clientX + 10;
         let y = rect.bottom + MENU_HEIGHT;
@@ -162,22 +160,7 @@ export const TextContextMenu = () => {
         Copy
       </Button>
 
-      <Button
-        variant="ghost"
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={() => {
-          if (position.indices.length > 1) {
-            clearSelection();
-            return;
-          }
-          toggleBookmark(position.indices[0], lines[position.indices[0]]);
-          clearSelection();
-        }}
-      >
-        <Bookmark />
-        {bookmarks.find((b) => position.indices[0] === b.index) ? 'Remove bookmark' : 'Bookmark'}
-      </Button>
-
+      {/* Highlight */}
       <Button
         variant="ghost"
         onMouseDown={(e) => e.preventDefault()}
@@ -189,42 +172,6 @@ export const TextContextMenu = () => {
         <Highlighter />
         {highlights.find((h) => position.indices.every((i) => h.indices.includes(i))) ? 'Remove highlight' : 'Highlight'}
       </Button>
-
-      {FEATURES.ENABLE_CAHPTER_EDIT && (
-        <Button
-          variant="ghost"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => {
-            if (position.indices.length > 1) {
-              clearSelection();
-              return;
-            }
-            toggleChapter(position.indices[0], lines[position.indices[0]]);
-            clearSelection();
-          }}
-        >
-          <Bookmark />
-          {chapters.find((c) => position.indices[0] === c.startIndex) ? 'Not a chapter' : 'Mark as chapter'}
-        </Button>
-      )}
-
-      {FEATURES.ENABLE_LINE_EDIT && (
-        <Button
-          variant="ghost"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={async () => {
-            if (position.indices.length > 1) {
-              clearSelection();
-              return;
-            }
-            await deleteLine(position.indices[0]);
-            clearSelection();
-          }}
-        >
-          <Trash2 />
-          Delete line
-        </Button>
-      )}
     </div>
   );
 };

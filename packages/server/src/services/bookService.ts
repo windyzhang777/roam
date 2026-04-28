@@ -9,6 +9,7 @@ import {
   CHAPTER_MARKER,
   CHAPTER_SIZE,
   DELETE_MARKER,
+  escapeRegExp,
   FONT_SIZE_DEFAULT,
   INDENT_DEFAULT,
   LINE_HEIGHT_DEFAULT,
@@ -439,18 +440,19 @@ export class BookService {
     }
 
     const matches: SearchMatch[] = [];
-
+    const isRegex = query.startsWith('/');
+    let regex: RegExp;
     try {
-      const regex = new RegExp(query, 'ig');
-      content.lines.forEach((line, index) => {
-        if (regex.test(line) && !line.startsWith(DELETE_MARKER)) {
-          matches.push({ index, text: line });
-        }
-      });
-    } catch (e) {
-      console.error('Invalid Regex pattern', e);
-      return [];
+      regex = new RegExp(isRegex ? query.slice(1) : escapeRegExp(query), 'ig');
+    } catch (error) {
+      regex = new RegExp(escapeRegExp(query), 'ig');
     }
+
+    content.lines.forEach((line, index) => {
+      if (regex.test(line) && !line.startsWith(DELETE_MARKER)) {
+        matches.push({ index, text: line });
+      }
+    });
 
     return matches;
   };
