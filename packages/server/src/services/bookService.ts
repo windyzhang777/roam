@@ -443,9 +443,9 @@ export class BookService {
     const isRegex = query.startsWith('/');
     let regex: RegExp;
     try {
-      regex = new RegExp(isRegex ? query.slice(1) : escapeRegExp(query), 'ig');
+      regex = new RegExp(isRegex ? query.slice(1) : escapeRegExp(query), 'i');
     } catch (error) {
-      regex = new RegExp(escapeRegExp(query), 'ig');
+      regex = new RegExp(escapeRegExp(query), 'i');
     }
 
     content.lines.forEach((line, index) => {

@@ -216,11 +216,16 @@ export class BookController {
 
   updateBook = async (req: Request, res: Response) => {
     try {
-      const updatedBook = await this.bookService.updateBook(req.params.id as string, {
+      const updates: Partial<Book> = {
         ...req.body,
-        lastReadAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-      });
+      };
+
+      if ('currentLine' in req.body) {
+        updates.lastReadAt = new Date().toISOString();
+      }
+
+      const updatedBook = await this.bookService.updateBook(req.params.id as string, updates);
 
       res.json(updatedBook);
     } catch (error) {

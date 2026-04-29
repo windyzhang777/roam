@@ -164,6 +164,7 @@ export function useBookReader(_id: string | undefined) {
     if (!_id) return;
     if (!confirm(`Delete line ${index}: ${lines[index].length > MAX_BOOKMARK_TEXT ? lines[index].slice(0, MAX_BOOKMARK_TEXT) + '...' : lines[index]}?`)) return;
 
+    setLines((prev) => prev.map((line, i) => (i === index ? DELETE_MARKER + line : line)));
     showToaster(
       renderDeleteToaster(index, async () => {
         hideToaster();
@@ -171,7 +172,6 @@ export function useBookReader(_id: string | undefined) {
       }),
     );
     await api.books.deleteLine(_id, index);
-    setLines((prev) => prev.map((line, i) => (i === index ? DELETE_MARKER + line : line)));
   };
 
   const restoreLine = async (index: number) => {

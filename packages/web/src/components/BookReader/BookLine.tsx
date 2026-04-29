@@ -103,6 +103,7 @@ export const BookLine = ({ index, line }: BookLineProps) => {
   if (isDeleted) {
     return <div key={`deleted-${index}`} style={{ height: '1px', margin: 0, padding: 0 }} className="w-full opacity-0 pointer-events-none" aria-hidden="true" />;
   }
+
   if (book && isImage) {
     const imageUrl = line.substring(IMAGE_MARKER.length);
     return <img key={index} src={`${import.meta.env.VITE_API_URL}${imageUrl}`} alt={`${book.title}-image-${index}`} className="w-full h-auto rounded-lg my-6 shadow-sm" />;

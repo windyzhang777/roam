@@ -377,7 +377,7 @@ export const BookReader = () => {
                     <TextContextMenu />
 
                     {/* Indicator Message */}
-                    {!isCurrentLineVisible && lines[currentLine] && (
+                    {book.lastReadAt && !isCurrentLineVisible && lines[currentLine] && (
                       <ActiveWordIndicator
                         line={lines[currentLine]}
                         onClick={() => {

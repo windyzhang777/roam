@@ -389,8 +389,9 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
                 scrollToView(targetIndex);
               }}
               title={`${bookmark.index + 1}: ${bookmark.text}`}
-              className="w-full justify-start px-2! py-2! h-auto! focus:ring-0 focus-visible:ring-0"
+              className="w-full flex-col justify-start items-start! h-auto! gap-2! py-4! focus:ring-0 focus-visible:ring-0"
             >
+              <span>{getChapter(bookmark.index, chapters)?.title}</span>
               <span className="w-full text-wrap text-left font-normal!">{bookmark.text}</span>
             </Button>
           ))}
@@ -409,8 +410,9 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
                 scrollToView(targetIndex);
               }}
               title={highlight.texts.join('')}
-              className="w-full justify-start px-2! py-2! h-auto! focus:ring-0 focus-visible:ring-0"
+              className="w-full flex-col justify-start items-start! h-auto! gap-2! py-4! focus:ring-0 focus-visible:ring-0"
             >
+              <span>{getChapter(highlight.indices[0], chapters)?.title}</span>
               <span className="w-full text-wrap text-left font-normal!">{highlight.texts.join(' ')}</span>
             </Button>
           ))}
@@ -455,7 +457,7 @@ export const SidePanelRight = ({ open, onClose }: BookSidePanelProps) => {
 
   useEffect(() => {
     scrollToView(currentMatch);
-  }, [currentMatch, scrollToView, viewLine]);
+  }, [currentMatch, scrollToView]);
 
   if (readingMode === 'search' && searchRes.length > 0) {
     return (
