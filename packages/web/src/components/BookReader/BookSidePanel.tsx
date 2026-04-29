@@ -78,9 +78,9 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
   const [selectedHighlight, setSelectedHighlight] = useState<number>();
   const { listRef, isAtTop, isAtBottom, onScroll, scrollToView, scrollToTop, scrollToBottom } = useScroll();
 
-  const { setBookmarks, setHighlights } = useBookContext();
+  const { setBookmarks, setHighlights, setChapters } = useBookContext();
   const { hydrateChapterByIndex, jumpToIndex } = useCommonContext();
-  const { saveBookmarksToLocal, importBookmarksFromLocal } = useSaveToLocal();
+  const { saveBookmarksToLocal, importBookmarksFromLocal, saveChaptersToLocal, importChaptersFromLocal, saveHighlightsToLocal, importHighlightsFromLocal } = useSaveToLocal();
 
   const selectTab = (index: number) => {
     setIndex(index);
@@ -102,6 +102,49 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
       </div>
 
       <div aria-label="jump buttons" className="mx-2.5 mb-4 px-1 rounded-sm flex flex-wrap md:justify-end items-center gap-1 md:flex-row [&_button]:my-1 [&_button]:p-0! [&_button]:w-6 [&_button]:h-6">
+        {/* Chapters feature buttons */}
+        {index === 0 && (
+          <>
+            {/* Save Chapters to Local */}
+            {FEATURES.ENABLE_CHAPTER_EDIT && (
+              <Button
+                size="icon"
+                variant="ghost"
+                disabled={chapters?.length === 0}
+                onClick={() => {
+                  if (!book || !chapters || chapters?.length === 0) return;
+                  const titleWithAuthor = bookTitleWithAuthor(book);
+                  if (!confirm(`Overwrite local chapters for ${titleWithAuthor}?`)) return;
+                  saveChaptersToLocal(titleWithAuthor, chapters);
+                }}
+                title="Save chapters to local"
+              >
+                <Save />
+              </Button>
+            )}
+
+            {/* Import Chapters */}
+            {FEATURES.ENABLE_CHAPTER_EDIT && (
+              <Button
+                size="icon"
+                variant="ghost"
+                disabled={!book?.title}
+                onClick={async () => {
+                  if (!book?.title) return;
+                  const titleWithAuthor = bookTitleWithAuthor(book);
+                  if (!confirm(`Import chapters for ${titleWithAuthor} from last saved?`)) return;
+                  const merged = await importChaptersFromLocal(titleWithAuthor, chapters ?? []);
+                  if (!merged || merged.length === 0) return;
+                  setChapters(merged);
+                }}
+                title="Import chapters from last saved"
+              >
+                <Plus />
+              </Button>
+            )}
+          </>
+        )}
+
         {/* Bookmarks feature buttons */}
         {index === 1 && (
           <>
@@ -163,6 +206,44 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
         {/* Highlight feature buttons */}
         {index === 2 && (
           <>
+            {/* Save Highlights to Local */}
+            {FEATURES.ENABLE_BOOKMARK_EDIT && (
+              <Button
+                size="icon"
+                variant="ghost"
+                disabled={highlights?.length === 0}
+                onClick={() => {
+                  if (!book || highlights?.length === 0) return;
+                  const titleWithAuthor = bookTitleWithAuthor(book);
+                  if (!confirm(`Overwrite local highlights for ${titleWithAuthor}?`)) return;
+                  saveHighlightsToLocal(titleWithAuthor, highlights);
+                }}
+                title="Save highlights to local"
+              >
+                <Save />
+              </Button>
+            )}
+
+            {/* Import Highlights */}
+            {FEATURES.ENABLE_BOOKMARK_EDIT && (
+              <Button
+                size="icon"
+                variant="ghost"
+                disabled={!book?.title}
+                onClick={async () => {
+                  if (!book?._id || !book?.title) return;
+                  const titleWithAuthor = bookTitleWithAuthor(book);
+                  if (!confirm(`Import highlights for ${titleWithAuthor} from last saved?`)) return;
+                  const merged = await importHighlightsFromLocal(book._id, titleWithAuthor, highlights ?? []);
+                  if (!merged || merged.length === 0) return;
+                  setHighlights(merged);
+                }}
+                title="Import highlights from last saved"
+              >
+                <Plus />
+              </Button>
+            )}
+
             {/* Delete Highlights */}
             <Button
               size="icon"
@@ -416,7 +497,7 @@ export const SidePanelRight = ({ open, onClose }: BookSidePanelProps) => {
                   <span className="w-full text-wrap text-left font-normal!">{renderHighlightedText(removeMarker(res.text), searchText)}</span>
                 </Button>
 
-                {FEATURES.ENABLE_CAHPTER_EDIT && (
+                {FEATURES.ENABLE_CHAPTER_EDIT && (
                   <Button
                     size="icon"
                     variant="outline"
