@@ -85,7 +85,7 @@ export const BookHeader = ({ searching, setOpenPanelLeft, setOpenPanelRight }: B
           {FEATURES.ENABLE_SCROLL_TO_END && (
             <Button
               size="icon"
-              variant="ghost"
+              variant="link"
               id="jump-to-end"
               title="Jump To End"
               onClick={async () => {

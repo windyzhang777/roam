@@ -127,7 +127,7 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
             {FEATURES.ENABLE_CHAPTER_EDIT && (
               <Button
                 size="icon"
-                variant="ghost"
+                variant="link"
                 disabled={chapters?.length === 0}
                 onClick={() => {
                   if (!book || !chapters || chapters?.length === 0) return;
@@ -145,7 +145,7 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
             {FEATURES.ENABLE_CHAPTER_EDIT && (
               <Button
                 size="icon"
-                variant="ghost"
+                variant="link"
                 disabled={!book?.title}
                 onClick={async () => {
                   if (!book?.title) return;
@@ -170,7 +170,7 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
             {FEATURES.ENABLE_BOOKMARK_EDIT && (
               <Button
                 size="icon"
-                variant="ghost"
+                variant="link"
                 disabled={bookmarks?.length === 0}
                 onClick={() => {
                   if (!book || !bookmarks || bookmarks?.length === 0) return;
@@ -188,7 +188,7 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
             {FEATURES.ENABLE_BOOKMARK_EDIT && (
               <Button
                 size="icon"
-                variant="ghost"
+                variant="link"
                 disabled={!book?.title}
                 onClick={async () => {
                   if (!book?._id || !book?.title) return;
@@ -228,7 +228,7 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
             {FEATURES.ENABLE_BOOKMARK_EDIT && (
               <Button
                 size="icon"
-                variant="ghost"
+                variant="link"
                 disabled={highlights?.length === 0}
                 onClick={() => {
                   if (!book || highlights?.length === 0) return;
@@ -246,7 +246,7 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
             {FEATURES.ENABLE_BOOKMARK_EDIT && (
               <Button
                 size="icon"
-                variant="ghost"
+                variant="link"
                 disabled={!book?.title}
                 onClick={async () => {
                   if (!book?._id || !book?.title) return;
@@ -520,14 +520,14 @@ export const SidePanelRight = ({ open, onClose }: BookSidePanelProps) => {
                 {FEATURES.ENABLE_CHAPTER_EDIT && (
                   <Button
                     size="icon"
-                    variant="outline"
+                    variant="link"
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();
                       toggleChapter(res.index, res.text);
                     }}
                     title="Add as chapter"
-                    className="absolute right-1 top-1/4 -translate-y-1/2 p-0! w-4! h-4! bg-popover text-popover-foreground shadow"
+                    className="absolute right-2 top-1/3 -translate-y-1/2 p-0! w-6! h-4! bg-background border! shadow"
                   >
                     <Plus />
                   </Button>
@@ -536,14 +536,14 @@ export const SidePanelRight = ({ open, onClose }: BookSidePanelProps) => {
                 {FEATURES.ENABLE_LINE_EDIT && (
                   <Button
                     size="icon"
-                    variant="outline"
+                    variant="link"
                     onClick={async (e) => {
                       e.stopPropagation();
                       e.preventDefault();
                       await deleteLine(res.index);
                     }}
                     title="Delete line"
-                    className="absolute right-1 top-3/4 -translate-y-1/2 p-0! w-4! h-4! bg-popover text-popover-foreground shadow"
+                    className="absolute right-2 top-2/3 -translate-y-1/2 p-0! w-6! h-4! bg-background border! shadow"
                   >
                     <Minus />
                   </Button>
