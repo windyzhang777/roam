@@ -18,7 +18,7 @@ interface BookItemModalProps {
 interface ScrapeBookProps extends BookItemModalProps {
   scrapeUrl: string;
   setScrapeUrl: Dispatch<SetStateAction<string>>;
-  onConfirm: () => Promise<void>;
+  onConfirm: () => void;
 }
 
 export const ScrapeBookModal = ({ open, onClose, title, scrapeUrl, setScrapeUrl, onConfirm }: ScrapeBookProps) => {

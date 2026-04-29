@@ -1,102 +1,86 @@
 import { api } from '@/services/api';
-import type { UploadProgress } from '@audiobook/shared';
+import type { Book, UploadProgress } from '@audiobook/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface ScrapeProgress extends UploadProgress {
   title?: string;
   message?: string;
 }
+export type ScrapeStatus = 'scraping' | 'error';
+export interface ScrapingBook {
+  id: string;
+  url: string;
+  title: string;
+  status: ScrapeStatus;
+  progress: ScrapeProgress;
+  error: string;
+  book?: Book;
+}
 
-export function useBookScrape(
-  onClose?: () => void,
-  onComplete?: () => void,
-  // setShowUrlInput: React.Dispatch<React.SetStateAction<boolean>>, loadBooks: () => Promise<void>
-) {
+let scrapeCount = 0;
+
+export function useBookScrape(onClose?: () => void, onComplete?: (book: Book) => void) {
   const [scrapeUrl, setScrapeUrl] = useState('');
-  const [isScraping, setIsScraping] = useState(false);
-  const [scrapeProgress, setScrapeProgress] = useState<ScrapeProgress | null>(null);
-  const [error, setError] = useState('');
+  const [scrapes, setScrapes] = useState<ScrapingBook[]>([]);
+  const stopRefs = useRef<Map<string, () => void>>(new Map());
 
-  const stopScrapeRef = useRef<(() => void) | null>(null);
+  const updateScrape = (id: string, patch: Partial<ScrapingBook>) => {
+    setScrapes((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)) || []);
+  };
 
-  const startScrape = useCallback(async () => {
-    if (!scrapeUrl.trim() || !scrapeUrl.startsWith('http')) {
-      setError('Invalid URL');
-      return;
+  const removeScrape = useCallback((id: string) => {
+    const closeFn = stopRefs.current.get(id);
+    if (closeFn) {
+      closeFn();
+      stopRefs.current.delete(id);
     }
+    setScrapes((prev) => prev.filter((s) => s.id !== id));
+  }, []);
 
-    setIsScraping(true);
-    setError('');
+  const startScrape = useCallback(() => {
+    if (!scrapeUrl.trim() || !scrapeUrl.startsWith('http')) return;
+
+    const id = `scrape-${++scrapeCount}`;
+    const url = scrapeUrl.trim();
+    const entry: ScrapingBook = {
+      id,
+      url,
+      title: '',
+      status: 'scraping',
+      progress: { uploadedBytes: 0, totalBytes: 0, percentage: 0, currentChunk: 0, totalChunks: 0, speed: 0, estimatedTimeRemaining: 0 },
+      error: '',
+    };
+    setScrapes((prev) => [entry, ...prev]);
+    setScrapeUrl('');
     onClose?.();
 
-    setScrapeProgress({
-      percentage: 0,
-      uploadedBytes: 0,
-      totalBytes: 0,
-      currentChunk: 0,
-      totalChunks: 0,
-      speed: 0,
-      estimatedTimeRemaining: 0,
-    });
-
     const closeFn = api.books.scrape(
-      scrapeUrl,
-      (progress) => {
-        setScrapeProgress(progress);
-      },
-      () => {
+      url,
+      (progress) => updateScrape(id, { progress, title: progress.title || '' }),
+      (book) => {
         // Success!
-        stopScrapeRef.current = null;
-        setIsScraping(false);
-        setScrapeProgress(null);
-        setScrapeUrl('');
-        onComplete?.();
+        stopRefs.current.delete(id);
+        setScrapes((prev) => prev.filter((s) => s.id !== id));
+        onComplete?.(book);
       },
       (errorMsg) => {
         // Error - keep progress visible
-        setError(errorMsg);
-        setIsScraping(false);
-        // setScrapeProgress(null);
+        updateScrape(id, { status: 'error', error: errorMsg });
       },
     );
 
-    stopScrapeRef.current = closeFn;
+    stopRefs.current.set(id, closeFn);
+    // stopScrapeRef.current = closeFn;
   }, [scrapeUrl, onClose, onComplete]);
 
-  const stopScrape = useCallback(() => {
-    if (!stopScrapeRef.current) return;
-
-    stopScrapeRef.current(); // Closes the EventSource
-    stopScrapeRef.current = null;
-    setIsScraping(false);
-    setScrapeProgress(null);
-    setError('');
-    console.log('⛔️ Scrape manually stopped by user');
-  }, []);
-
-  const resetScrapeError = useCallback(() => {
-    setError('');
-    setScrapeProgress(null);
-  }, []);
+  const isScraping = scrapes.some((s) => s.status === 'scraping');
 
   useEffect(() => {
     return () => {
-      if (stopScrapeRef.current) stopScrapeRef.current();
+      stopRefs.current.forEach((stopFn) => stopFn());
+      stopRefs.current.clear();
     };
   }, []);
 
-  // hijack the browser's default escape
-  useEffect(() => {
-    const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isScraping) {
-        e.preventDefault();
-        stopScrape();
-      }
-    };
-
-    window.addEventListener('keydown', handleGlobalKeyDown);
-    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [isScraping, stopScrape]);
-
-  return { scrapeUrl, setScrapeUrl, isScraping, scrapeProgress, error, startScrape, stopScrape, resetScrapeError };
+  return { scrapeUrl, setScrapeUrl, scrapes, isScraping, startScrape, removeScrape };
 }

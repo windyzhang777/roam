@@ -57,5 +57,5 @@ export function useBooks() {
     loadBooks();
   }, [loadBooks]);
 
-  return { books, loading, loadBooks, updateBook, deleteBook, addBook };
+  return { books, loading, updateBook, deleteBook, addBook };
 }

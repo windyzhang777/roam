@@ -6,9 +6,9 @@ import { useScrapeUpdates } from '@/common/useScrapeUpdates';
 import { Button } from '@/components//ui/button';
 import { BookItem, BookItemUploading, ConfirmModal, EditBookInfo } from '@/components/BookItem';
 import { ScrapeBookModal } from '@/components/BookItem/BookItemModal';
+import { BookItemScraping } from '@/components/BookItem/BookItemScraping';
 import { useTheme } from '@/components/theme-provider';
 import { ButtonGroup } from '@/components/ui/button-group';
-import { ScrapeProgress } from '@/components/UploadProgress';
 import { FEATURES } from '@/config/features';
 import { getBookActionLabel, type Book } from '@audiobook/shared';
 import { BookOpen, CirclePlus, Cloudy, Loader, Moon, Sun } from 'lucide-react';
@@ -25,7 +25,7 @@ export const BookList = () => {
   const { theme, setTheme } = useTheme();
 
   // data hook
-  const { books, loading, loadBooks, updateBook, deleteBook, addBook } = useBooks();
+  const { books, loading, updateBook, deleteBook, addBook } = useBooks();
 
   // action hook - action on book menu & modal
   const { pendingAction, closeAction, openAction } = useBookAction();
@@ -34,17 +34,9 @@ export const BookList = () => {
   const { uploads, startUpload, removeUpload } = useBookUpload((book: Book) => addBook(book));
 
   // scrape hook - scrape web book
-  const {
-    scrapeUrl,
-    setScrapeUrl,
-    isScraping,
-    scrapeProgress,
-    error: errorScrape,
-    startScrape,
-    stopScrape,
-  } = useBookScrape(
+  const { scrapeUrl, setScrapeUrl, scrapes, isScraping, startScrape, removeScrape } = useBookScrape(
     () => closeAction(),
-    () => loadBooks(),
+    (book: Book) => addBook(book),
   );
 
   // scrape web book chapter updates
@@ -172,7 +164,19 @@ export const BookList = () => {
             }}
           />
         ))}
-        {booksToRead.length === 0 && uploads.length === 0 && booksCompleted.length > 0 && (
+        {/* Scraping Books */}
+        {scrapes.map((scrape) => (
+          <BookItemScraping
+            key={scrape.id}
+            scrape={scrape}
+            onRemove={() => {
+              if (scrape.status === 'scraping' && !confirm(`Stop scraping ${scrape.title}?`)) return;
+              removeScrape(scrape.id);
+            }}
+          />
+        ))}
+        {/* Books to read */}
+        {booksToRead.length === 0 && uploads.length === 0 && scrapes.length === 0 && booksCompleted.length > 0 && (
           <div className="text-center text-gray-500 col-span-full">
             <BookOpen className="mx-auto mb-4 opacity-50" />
             <p>Upload a new book!</p>
@@ -226,9 +230,6 @@ export const BookList = () => {
           </div>
         </>
       )}
-
-      {/* Scrape Progress Modal */}
-      {scrapeProgress ? <ScrapeProgress progress={scrapeProgress} error={errorScrape} stopScrape={stopScrape} /> : null}
 
       {/* Book Item Modal */}
       {/* Web Book Modal */}

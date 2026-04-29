@@ -344,13 +344,14 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
         {index === 0 &&
           chapters?.length > 0 &&
           chapters
-            .filter((chapter) => chapter.isLoaded)
+            // .filter((chapter) => chapter.isLoaded)
             .map((chapter, index) => (
               <Button
                 autoFocus={index === viewChapter?.chapterIndex}
                 variant={index === viewChapter?.chapterIndex ? 'secondary' : 'ghost'}
                 key={`chapter-${index}`}
                 value={index}
+                disabled={!chapter.isLoaded}
                 onClick={async () => {
                   const chapter = chapters[index];
                   if (!chapter) return;
