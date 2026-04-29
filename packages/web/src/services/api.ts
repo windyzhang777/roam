@@ -258,7 +258,7 @@ export const api = {
      */
     upload: async (file: File, config?: Partial<ChunkedUploadConfig>) => {
       const uploader = new ChunkedUploader(file, config);
-      return { book: uploader.upload(), uploader };
+      return { bookPromise: uploader.upload(), uploader };
     },
   },
 };

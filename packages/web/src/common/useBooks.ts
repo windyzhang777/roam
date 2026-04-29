@@ -49,9 +49,13 @@ export function useBooks() {
     [books],
   );
 
+  const addBook = useCallback((book: Book) => {
+    setBooks((prev) => [book, ...prev.filter((b) => b._id !== book._id)]);
+  }, []);
+
   useEffect(() => {
     loadBooks();
   }, [loadBooks]);
 
-  return { books, loading, loadBooks, updateBook, deleteBook };
+  return { books, loading, loadBooks, updateBook, deleteBook, addBook };
 }

@@ -4,11 +4,11 @@ import { useBookScrape } from '@/common/useBookScrape';
 import { useBookUpload } from '@/common/useBookUpload';
 import { useScrapeUpdates } from '@/common/useScrapeUpdates';
 import { Button } from '@/components//ui/button';
-import { BookItem, ConfirmModal, EditBookInfo } from '@/components/BookItem';
+import { BookItem, BookItemUploading, ConfirmModal, EditBookInfo } from '@/components/BookItem';
 import { ScrapeBookModal } from '@/components/BookItem/BookItemModal';
 import { useTheme } from '@/components/theme-provider';
 import { ButtonGroup } from '@/components/ui/button-group';
-import { ScrapeProgress, UploadProgress } from '@/components/UploadProgress';
+import { ScrapeProgress } from '@/components/UploadProgress';
 import { FEATURES } from '@/config/features';
 import { getBookActionLabel, type Book } from '@audiobook/shared';
 import { BookOpen, CirclePlus, Cloudy, Loader, Moon, Sun } from 'lucide-react';
@@ -25,13 +25,13 @@ export const BookList = () => {
   const { theme, setTheme } = useTheme();
 
   // data hook
-  const { books, loading, loadBooks, updateBook, deleteBook } = useBooks();
+  const { books, loading, loadBooks, updateBook, deleteBook, addBook } = useBooks();
 
   // action hook - action on book menu & modal
   const { pendingAction, closeAction, openAction } = useBookAction();
 
   // upload hook - upload local book
-  const { uploadingFile, status, progress, error: errorUpload, startUpload, cancleUpload } = useBookUpload(() => loadBooks());
+  const { uploads, startUpload, removeUpload } = useBookUpload((book: Book) => addBook(book));
 
   // scrape hook - scrape web book
   const {
@@ -161,7 +161,18 @@ export const BookList = () => {
 
       {/* Books To Read */}
       <div className="py-2 flex flex-wrap gap-2 justify-center md:justify-start">
-        {booksToRead.length === 0 && booksCompleted.length > 0 && (
+        {/* Uploading Books */}
+        {uploads.map((upload) => (
+          <BookItemUploading
+            key={upload.id}
+            upload={upload}
+            onRemove={() => {
+              if (upload.status === 'uploading' && !confirm(`Cancel uploading ${upload.fileName ?? 'book'}?`)) return;
+              removeUpload(upload.id);
+            }}
+          />
+        ))}
+        {booksToRead.length === 0 && uploads.length === 0 && booksCompleted.length > 0 && (
           <div className="text-center text-gray-500 col-span-full">
             <BookOpen className="mx-auto mb-4 opacity-50" />
             <p>Upload a new book!</p>
@@ -215,9 +226,6 @@ export const BookList = () => {
           </div>
         </>
       )}
-
-      {/* Upload Progress Modal */}
-      {uploadingFile && <UploadProgress file={uploadingFile} status={status} progress={progress} error={errorUpload} cancleUpload={cancleUpload} />}
 
       {/* Scrape Progress Modal */}
       {scrapeProgress ? <ScrapeProgress progress={scrapeProgress} error={errorScrape} stopScrape={stopScrape} /> : null}

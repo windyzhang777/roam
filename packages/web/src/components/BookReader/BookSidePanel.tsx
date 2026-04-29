@@ -99,6 +99,24 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
         <Button size="icon" variant={index === 2 ? 'default' : 'outline'} onClick={() => selectTab(2)} title="Highlights">
           <Highlighter />
         </Button>
+        {FEATURES.ENABLE_CHAPTER_EDIT && FEATURES.ENABLE_BOOKMARK_EDIT && (
+          <Button
+            size="icon"
+            variant="link"
+            disabled={!book?.title}
+            onClick={() => {
+              if (!book) return;
+              const titleWithAuthor = bookTitleWithAuthor(book);
+              if (!confirm(`Overwrite all local (chapters, bookmarks, and highlights) for ${titleWithAuthor}?`)) return;
+              if (chapters?.length) saveChaptersToLocal(titleWithAuthor, chapters);
+              if (bookmarks?.length) saveBookmarksToLocal(titleWithAuthor, bookmarks);
+              if (highlights?.length) saveHighlightsToLocal(titleWithAuthor, highlights);
+            }}
+            title="Save all to local"
+          >
+            <Save />
+          </Button>
+        )}
       </div>
 
       <div aria-label="jump buttons" className="mx-2.5 mb-4 px-1 rounded-sm flex flex-wrap md:justify-end items-center gap-1 md:flex-row [&_button]:my-1 [&_button]:p-0! [&_button]:w-6 [&_button]:h-6">

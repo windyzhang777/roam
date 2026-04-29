@@ -1,76 +1,75 @@
 import { api } from '@/services/api';
 import type { ChunkedUploader } from '@/services/chunkedUploader';
-import { type UploadProgress } from '@audiobook/shared';
+import { type Book, type UploadProgress } from '@audiobook/shared';
 import { useCallback, useRef, useState } from 'react';
 
 export type UploadStatus = 'uploading' | 'completed' | 'error' | 'cancelled';
+export interface UploadingBook {
+  id: string;
+  fileName: string;
+  status: UploadStatus;
+  progress: UploadProgress;
+  error: string;
+  book?: Book;
+}
 
-export function useBookUpload(onComplete?: () => void) {
-  const [uploadingFile, setUploadingFile] = useState<File>();
-  const [status, setStatus] = useState<UploadStatus>('uploading');
-  const [progress, setProgress] = useState<UploadProgress>({
-    uploadedBytes: 0,
-    totalBytes: uploadingFile?.size || 0,
-    percentage: 0,
-    currentChunk: 0,
-    totalChunks: 0,
-    speed: 0,
-    estimatedTimeRemaining: 0,
-  });
-  const [error, setError] = useState<string>('');
+let uploadCount = 0;
 
-  const uploadStarted = useRef(false);
-  const uploaderRef = useRef<ChunkedUploader | null>(null);
+export function useBookUpload(onComplete?: (book: Book) => void) {
+  const [uploads, setUploads] = useState<UploadingBook[]>([]);
+  const uploaderRefs = useRef<Map<string, ChunkedUploader>>(new Map());
 
-  const resetUpload = useCallback(() => {
-    setUploadingFile(undefined);
-    uploadStarted.current = false;
+  const updateUpload = (id: string, patch: Partial<UploadingBook>) => {
+    setUploads((prev) => prev.map((u) => (u.id === id ? { ...u, ...patch } : u)) || []);
+  };
+
+  const removeUpload = useCallback((id: string) => {
+    const uploader = uploaderRefs.current.get(id);
+    if (uploader) {
+      uploader.cancel();
+      uploaderRefs.current.delete(id);
+    }
+    setUploads((prev) => prev.filter((u) => u.id !== id));
   }, []);
 
   const startUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (!file || uploadStarted.current) return;
+      if (!file) return;
+      e.target.value = '';
 
-      uploadStarted.current = true;
-      setUploadingFile(file);
-      setStatus('uploading');
+      const id = `upload-${++uploadCount}`;
+      const fileName = file.name;
+      setUploads((prev) => prev.filter((u) => !(u.fileName === fileName && u.status === 'error')));
+
+      const entry: UploadingBook = {
+        id,
+        fileName,
+        status: 'uploading',
+        progress: { uploadedBytes: 0, totalBytes: file.size, percentage: 0, currentChunk: 0, totalChunks: 0, speed: 0, estimatedTimeRemaining: 0 },
+        error: '',
+      };
+      setUploads((prev) => [entry, ...prev]);
 
       try {
-        const { book, uploader } = await api.upload.upload(file, {
-          onProgress: (p) => {
-            setProgress(p);
-          },
-          onError: (err) => {
-            setStatus('error');
-            setError(err.message);
-          },
+        const { bookPromise, uploader } = await api.upload.upload(file, {
+          onProgress: (p) => updateUpload(id, { progress: p }),
+          onError: (err) => updateUpload(id, { status: 'error', error: err instanceof Error ? err.message : 'Upload failed' }),
         });
-        uploaderRef.current = uploader;
-        await book;
 
-        setStatus('completed');
-        setTimeout(() => {
-          onComplete?.();
-          resetUpload();
-        }, 1500);
+        uploaderRefs.current.set(id, uploader);
+
+        const book = await bookPromise;
+        setUploads((prev) => prev.filter((u) => u.id !== id));
+        onComplete?.(book);
       } catch (error) {
-        setStatus('error');
-        setError(error instanceof Error ? error.message : 'Upload failed');
+        updateUpload(id, { status: 'error', error: error instanceof Error ? error.message : 'Upload failed' });
       } finally {
         e.target.value = '';
       }
     },
-    [onComplete, resetUpload],
+    [onComplete],
   );
 
-  const cancleUpload = useCallback(() => {
-    if (uploaderRef.current) {
-      uploaderRef.current.cancel();
-    }
-    setStatus('cancelled');
-    resetUpload();
-  }, [resetUpload]);
-
-  return { uploadingFile, status, progress, error, startUpload, cancleUpload };
+  return { uploads, startUpload, removeUpload };
 }

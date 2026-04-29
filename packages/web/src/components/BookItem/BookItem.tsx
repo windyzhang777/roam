@@ -16,6 +16,7 @@ interface BookItemProps {
 
 export const BookItem = ({ book, isSelected, selectBook, hasNewChapters, updateChapters, canAction, openAction }: BookItemProps) => {
   const navigate = useNavigate();
+  const coverPath = book?.coverPath ? (book.coverPath.startsWith('blob:') || book.coverPath.startsWith('data:') ? book.coverPath : `${import.meta.env.VITE_API_URL}${book.coverPath}`) : '';
 
   const progress = calculateProgress(book.currentLine, book.totalLines);
 
@@ -41,7 +42,7 @@ export const BookItem = ({ book, isSelected, selectBook, hasNewChapters, updateC
         {book.coverPath ? (
           <>
             <img
-              src={book.coverPath.startsWith('blob:') || book.coverPath.startsWith('data:') ? book.coverPath : `${import.meta.env.VITE_API_URL}${book.coverPath}`}
+              src={coverPath}
               alt={`${book.title} cover`}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-100"
               onError={(e) => (e.currentTarget.src = '')}
@@ -76,7 +77,7 @@ export const BookItem = ({ book, isSelected, selectBook, hasNewChapters, updateC
           <span>{formatLocaleDateString(new Date(book.lastReadAt || book.updatedAt))}</span>
         </span>
       ) : book.currentLine === 0 ? (
-        <span className="absolute bottom-3 left-2 w-[75%] text-[10px] flex items-center gap-1 text-left pointer-events-none">
+        <span className="absolute bottom-3.5 left-2 w-[75%] text-[10px] flex items-center gap-1 text-left pointer-events-none">
           <CircleChevronRight strokeWidth={1} className="w-4 h-4 fill-green-600 stroke-background" />
           <span className="w-full truncate justify-start">{book.title}</span>
         </span>
