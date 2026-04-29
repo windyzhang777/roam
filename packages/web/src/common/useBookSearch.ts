@@ -27,7 +27,7 @@ export function useBookSearch(
 
     setLoading(true);
     try {
-      const { matches } = await api.books.search(id, cleanSearchText);
+      const { matches } = await api.books.search(id, searchText);
       setSearchRes(matches);
       if (!matches || matches.length === 0) return;
 

@@ -3,8 +3,9 @@ import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { useBookContext, useCommonContext, useContentContext, useSearchContext, useViewLineContext } from '@/config/contexts';
 import { FEATURES } from '@/config/features';
+import { focusBody } from '@/utils';
 import { bookTitleWithAuthor } from '@audiobook/shared';
-import { ArrowBigDown, ArrowBigUp, Bookmark, LibraryBig, ListEnd, ListStart, Loader, PanelLeft, Search, Settings, X } from 'lucide-react';
+import { ArrowBigDown, ArrowBigUp, Bookmark, Fullscreen, LibraryBig, ListEnd, ListStart, Loader, Minus, Plus, Search, Settings, X } from 'lucide-react';
 import { type SetStateAction } from 'react';
 
 interface BookHeaderProps {
@@ -14,11 +15,12 @@ interface BookHeaderProps {
 }
 
 export const BookHeader = ({ searching, setOpenPanelLeft, setOpenPanelRight }: BookHeaderProps) => {
-  const { book, currentLine, chapters, bookmarks, toggleBookmark, viewChapter, totalLines } = useBookContext();
+  const { book, currentLine, chapters, bookmarks, toggleBookmark, viewChapter, totalLines, toggleChapter, deleteLine } = useBookContext();
   const { isPlaying, readingMode, jumpToIndex, userScroll, navigateBack } = useCommonContext();
   const { lines } = useContentContext();
   const { viewLine } = useViewLineContext();
   const { searchInputRef, searchText, setSearchText, openSearch, closeSearch, prevMatch, nextMatch } = useSearchContext();
+  const isChapter = chapters.find((c) => currentLine === c.startIndex);
   const isBookmarked = bookmarks.find((b) => currentLine === b.index);
 
   if (!book || currentLine === undefined) return null;
@@ -28,9 +30,24 @@ export const BookHeader = ({ searching, setOpenPanelLeft, setOpenPanelRight }: B
       <nav id="controls" className="relative px-4 pt-0 pb-10 md:py-4">
         {/* Left Panel Group */}
         <div id="panel-left" title="Bookmars & Chapters" className="flex items-center gap-2">
-          {/* Left Panel */}
-          <Button size="icon" variant="ghost" onClick={() => setOpenPanelLeft((prev) => !prev)}>
-            <PanelLeft />
+          {/* Back to Books */}
+          <Button size="icon" variant="ghost" id="back-to-books" title="Back to Books" onClick={() => navigateBack(false)}>
+            <LibraryBig />
+          </Button>
+
+          {/* Close Side Panels */}
+          <Button
+            size="icon"
+            variant="ghost"
+            id="close-panels"
+            title="Close Side Panels"
+            onClick={() => {
+              setOpenPanelLeft((prev) => !prev);
+              setOpenPanelRight((prev) => !prev);
+              focusBody();
+            }}
+          >
+            <Fullscreen />
           </Button>
 
           {/* Jump to Start */}
@@ -98,20 +115,6 @@ export const BookHeader = ({ searching, setOpenPanelLeft, setOpenPanelRight }: B
           )}
         </div>
 
-        {/* Back to Books */}
-        <div className="absolute top-0 left-1/2 md:left-72 -translate-x-1/2 h-7 md:h-13 duration-200 transition-opacity">
-          <Button
-            size="icon"
-            variant="ghost"
-            id="back-to-books"
-            title="Back to Books"
-            onClick={() => navigateBack(false)}
-            className="h-full pb-1! md:pb-3.5! rounded-t-none! bg-sidebar-accent flex items-end!"
-          >
-            <LibraryBig />
-          </Button>
-        </div>
-
         {/* Book Title */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/12 md:-translate-y-1/2 flex justify-center items-center w-[clamp(40px,80%,80%)] md:w-[clamp(40px,60%,30%)] lg:w-[40%]">
           <span title={bookTitleWithAuthor(book)} className="w-auto truncate font-semibold">
@@ -120,7 +123,7 @@ export const BookHeader = ({ searching, setOpenPanelLeft, setOpenPanelRight }: B
         </div>
 
         {/* Right Panel Group */}
-        <div id="panel-right" title="Font & Voice" className="flex items-center gap-4">
+        <div id="panel-right" title="Font & Voice" className="flex items-center gap-2">
           {/* Search text */}
           <Button
             size="icon"
@@ -199,6 +202,36 @@ export const BookHeader = ({ searching, setOpenPanelLeft, setOpenPanelRight }: B
           >
             <Bookmark className={isBookmarked && 'fill-primary stroke-primary'} />
           </Button>
+
+          {FEATURES.ENABLE_CHAPTER_EDIT && (
+            <Button
+              size="icon"
+              variant="link"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                toggleChapter(currentLine, lines[currentLine]);
+              }}
+              title={isChapter ? 'Remove chapter' : 'Add as chapter'}
+            >
+              <Plus />
+            </Button>
+          )}
+
+          {FEATURES.ENABLE_LINE_EDIT && (
+            <Button
+              size="icon"
+              variant="link"
+              onClick={async (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                await deleteLine(currentLine);
+              }}
+              title="Delete line"
+            >
+              <Minus />
+            </Button>
+          )}
 
           {/* Right Panel */}
           <Button

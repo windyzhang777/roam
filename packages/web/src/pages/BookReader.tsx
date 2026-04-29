@@ -11,6 +11,7 @@ import { SidePanelLeft, SidePanelRight } from '@/components/BookReader/BookSideP
 import { Button } from '@/components/ui/button';
 import { TextContextMenu } from '@/components/ui/ContextMenu';
 import { BookContext, CommonContext, ContentContext, SearchContext, SettingContext, SpeechContext, ViewLineContext } from '@/config/contexts';
+import { cn } from '@/lib/utils';
 import { wordHighlightStore } from '@/stores/wordHighlightStore';
 import { focusBody, getChapterIndex } from '@/utils';
 import { bookTitleWithAuthor, type BookMark } from '@audiobook/shared';
@@ -83,9 +84,6 @@ export const BookReader = () => {
     availableVoices,
   } = useReaderSettings(_id, lang);
 
-  // speech hook
-  const { isPlaying, play, pause, resume, stop } = useBookSpeech(_id, lines, lang, totalLines, selectedVoice, rate, currentLine, updateCurrentLine, loadMoreLines, onBookCompleted);
-
   // navigation hook
   const {
     viewLine,
@@ -102,6 +100,17 @@ export const BookReader = () => {
     jumpToRead,
     jumpToIndex,
   } = useBookNavigation(currentLine, lines, loadMoreLines);
+
+  const startFromLine = useCallback(
+    (index: number) => {
+      updateCurrentLine(index);
+      updateViewLine(index);
+    },
+    [updateCurrentLine, updateViewLine],
+  );
+
+  // speech hook
+  const { isPlaying, play, pause, resume, stop } = useBookSpeech(_id, lines, lang, totalLines, selectedVoice, rate, currentLine, startFromLine, loadMoreLines, onBookCompleted);
 
   // search hook
   const {
@@ -141,14 +150,6 @@ export const BookReader = () => {
     flushBook();
     flushSetting();
   };
-
-  const startFromLine = useCallback(
-    (index: number) => {
-      updateCurrentLine(index);
-      updateViewLine(index);
-    },
-    [updateCurrentLine, updateViewLine],
-  );
 
   const ttsFocus = useCallback(() => {
     closeSearch();
@@ -373,7 +374,7 @@ export const BookReader = () => {
                       {/* End of Virtuoso */}
                     </div>
 
-                    <BookControl />
+                    <BookControl setOpenPanelLeft={setOpenPanelLeft} />
                     <TextContextMenu />
 
                     {/* Indicator Message */}
@@ -428,7 +429,12 @@ const ActiveWordIndicator = ({ line, onClick }: { line: string; onClick: () => v
   const word = hasActive && activeWord ? line.slice(activeWord.charIndex, activeWord.charIndex + activeWord.charLength) : line.slice(0, 5);
 
   return (
-    <Button variant="ghost" id="indicator-message" onClick={onClick} className="z-20 p-2 truncate absolute top-25 left-1/2 -translate-x-1/2 px-4 py-1 text-sm justify-start bg-highlight">
+    <Button
+      variant="ghost"
+      id="indicator-message"
+      onClick={onClick}
+      className={cn('z-20 p-2 truncate absolute top-25 left-1/2 -translate-x-1/2 px-4 py-1 text-sm justify-start bg-highlight', 'opacity-20 hover:opacity-100 transition-opacity duration-300')}
+    >
       <ChevronRight size={12} />
       <mark className="rounded-md outline-none bg-primary">{word}</mark>
     </Button>

@@ -46,7 +46,7 @@ export default function useBookNavigation(currentLine: number, lines: string[], 
 
   const scrollToLine = useCallback((index: number, behavior: LocationOptions['behavior'] = 'auto') => {
     console.log(`scrollToLine :`, behavior);
-    virtuosoRef.current?.scrollToIndex({ index, align: 'start', behavior, offset: -100 });
+    virtuosoRef.current?.scrollToIndex({ index, align: 'start', behavior, offset: -20 });
   }, []);
 
   const jumpToRead = (index: number) => {
@@ -98,10 +98,11 @@ export default function useBookNavigation(currentLine: number, lines: string[], 
     if (isUserScrollRef.current || isVisible) return;
     scrollToLine(currentLine, 'smooth');
 
-    if (!isSearchJumpingRef.current && currentLine !== viewLineRef.current) {
-      startTimer(() => updateViewLine(currentLine), 100);
+    viewLineRef.current = currentLine;
+    if (!isSearchJumpingRef.current) {
+      updateViewLine(viewLineRef.current);
     }
-  }, [updateIsCurrentLineVisible, currentLine, scrollToLine, startTimer, updateViewLine]);
+  }, [updateIsCurrentLineVisible, currentLine, scrollToLine, updateViewLine]);
 
   // update line visibility on lines change
   useEffect(() => {
