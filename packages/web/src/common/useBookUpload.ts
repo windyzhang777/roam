@@ -53,7 +53,7 @@ export function useBookUpload(onComplete?: (book: Book) => void) {
 
       try {
         const { bookPromise, uploader } = await api.upload.upload(file, {
-          onProgress: (p) => updateUpload(id, { progress: p }),
+          onProgress: (progress) => updateUpload(id, { progress }),
           onError: (err) => updateUpload(id, { status: 'error', error: err instanceof Error ? err.message : 'Upload failed' }),
         });
 

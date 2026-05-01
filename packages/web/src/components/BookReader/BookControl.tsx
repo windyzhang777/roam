@@ -38,7 +38,7 @@ export const BookControl = ({ setOpenPanelLeft }: BookControlProps) => {
           {currentLine} / {totalLines}
         </span>
         <Button variant="ghost" onClick={() => setOpenPanelLeft((prev) => !prev)} title="Open Table of Contents" className="text-xs max-w-48">
-          <span className="truncate">{currentChapter?.title}</span>
+          <span className="truncate">{currentChapter?.title || 'Table of Contents'}</span>
         </Button>
         <span className="flex justify-end">{calculateProgress(currentLine, totalLines)}%</span>
       </div>

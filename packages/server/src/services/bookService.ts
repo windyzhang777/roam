@@ -370,7 +370,9 @@ export class BookService {
     // Clean up metadata
     const chapters = (book.chapters || []).filter((c) => c.startIndex !== index && c.source !== '' + index);
     const bookmarks = (book.bookmarks || []).filter((b) => b.index !== index);
-    const highlights = (book.highlights || []).filter((h) => !h.indices.includes(index));
+    const highlights = (book.highlights || [])
+      .map((h) => ({ ...h, indices: h.indices.filter((idx) => idx === index), texts: h.texts.filter((_, i) => h.indices[i] === index) }))
+      .filter((h) => h.indices.length > 0);
 
     await this.bookRepository.updateBook(_id, { chapters, bookmarks, highlights });
     await this.bookRepository.setContent(_id, content);

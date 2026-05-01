@@ -11,14 +11,16 @@ import { useTheme } from '@/components/theme-provider';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { FEATURES } from '@/config/features';
 import { getBookActionLabel, type Book } from '@audiobook/shared';
-import { BookOpen, CirclePlus, Cloudy, Loader, Moon, Sun } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, CirclePlus, Cloudy, Loader, Moon, Sun } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 export const BookList = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
-  const [showFinished, setShowFinished] = useState(true);
+  const [showCompleted, setShowCompleted] = useState(true);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
   // theme hook
@@ -192,6 +194,7 @@ export const BookList = () => {
             updateChapters={() => updateChapters(book._id)}
             canAction="markCompleted"
             openAction={openAction}
+            onPress={() => navigate(`/book/${book._id}`)}
           />
         ))}
       </div>
@@ -203,14 +206,14 @@ export const BookList = () => {
             <Button
               variant="ghost"
               aria-label="completed-books"
-              title={`${showFinished ? 'Collapse' : 'Expand'} completed books`}
-              onClick={() => setShowFinished((prev) => !prev)}
+              title={`${showCompleted ? 'Collapse' : 'Expand'} completed books`}
+              onClick={() => setShowCompleted((prev) => !prev)}
               className="hover:text-gray-600 transition-colors"
             >
-              Completed ({booksCompleted.length})
+              Completed ({booksCompleted.length}){showCompleted ? <ChevronUp /> : <ChevronDown />}
             </Button>
           </div>
-          <div className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${showFinished ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+          <div className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${showCompleted ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
             <div className="overflow-hidden">
               <div className="py-2 flex flex-wrap gap-2 justify-center md:justify-start">
                 {booksCompleted.map((book) => (
@@ -223,6 +226,7 @@ export const BookList = () => {
                     updateChapters={() => updateChapters(book._id)}
                     canAction="resetProgress"
                     openAction={openAction}
+                    onPress={() => navigate(`/book/${book._id}`)}
                   />
                 ))}
               </div>

@@ -44,7 +44,7 @@ export const VoiceContextMenu = (props: BookControlContextMenuProps) => {
             }
           }}
           onCloseAutoFocus={(e) => e.preventDefault()}
-          className="w-full max-h-100 min-h-0 flex-1 p-6 no-scrollbar overflow-y-auto overflow-x-hidden"
+          className="w-full max-w-48 max-h-100 min-h-0 flex-1 p-6 no-scrollbar overflow-y-auto overflow-x-hidden"
         >
           <div className="flex flex-col gap-2">
             <div className="uppercase text-xs">voice</div>
@@ -59,7 +59,7 @@ export const VoiceContextMenu = (props: BookControlContextMenuProps) => {
                     if (isPlaying) resume();
                   }}
                   title={option.displayName}
-                  className="px-2 w-30 border! border-sidebar-accent! truncate"
+                  className="px-2 w-full border! border-sidebar-accent! truncate"
                 >
                   <span className="w-full truncate">{option.displayName}</span>
                 </Button>
@@ -107,6 +107,7 @@ export const RateContextMenu = (props: BookControlContextMenuProps) => {
           className="w-full p-6"
         >
           <div className="flex flex-col gap-4 w-40">
+            <div className="uppercase text-xs">speech rate</div>
             <ButtonGroup className="flex justify-between items-center gap-4 w-full">
               <Button
                 size="icon"

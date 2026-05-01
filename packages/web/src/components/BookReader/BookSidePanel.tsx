@@ -3,7 +3,7 @@ import useScroll from '@/common/useScroll';
 import { Button } from '@/components//ui/button';
 import { useTheme } from '@/components/theme-provider';
 import { ButtonGroup } from '@/components/ui/button-group';
-import { SidePanel } from '@/components/ui/SidePanel';
+import { SidePanel, SidePanelContent, SidePanelHeader } from '@/components/ui/SidePanel';
 import { Slider } from '@/components/ui/slider';
 import { useBookContext, useCommonContext, useContentContext, useSearchContext, useSettingContext, useViewLineContext } from '@/config/contexts';
 import { FEATURES } from '@/config/features';
@@ -89,7 +89,7 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
 
   return (
     <SidePanel direction="left" open={open} onClose={onClose}>
-      <div className="px-2 relative flex flex-wrap mb-2 md:justify-start items-center text-sm text-muted-foreground">
+      <SidePanelHeader className="px-2 md:justify-start">
         <Button size="icon" variant={index === 0 ? 'default' : 'outline'} onClick={() => selectTab(0)} disabled={!showChapters} title="Chapters">
           <TableOfContents />
         </Button>
@@ -117,7 +117,7 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
             <Save />
           </Button>
         )}
-      </div>
+      </SidePanelHeader>
 
       <div aria-label="jump buttons" className="mx-2.5 mb-4 px-1 rounded-sm flex flex-wrap md:justify-end items-center gap-1 md:flex-row [&_button]:my-1 [&_button]:p-0! [&_button]:w-6 [&_button]:h-6">
         {/* Chapters feature buttons */}
@@ -304,7 +304,7 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
         </>
       </div>
 
-      <div
+      <SidePanelContent
         ref={listRef}
         onScroll={onScroll}
         onKeyDown={async (e) => {
@@ -343,39 +343,37 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
       >
         {index === 0 &&
           chapters?.length > 0 &&
-          chapters
-            // .filter((chapter) => chapter.isLoaded)
-            .map((chapter, index) => (
-              <Button
-                autoFocus={index === viewChapter?.chapterIndex}
-                variant={index === viewChapter?.chapterIndex ? 'secondary' : 'ghost'}
-                key={`chapter-${index}`}
-                value={index}
-                disabled={!chapter.isLoaded}
-                onClick={async () => {
-                  const chapter = chapters[index];
-                  if (!chapter) return;
-                  let targetLineIndex = chapter.startIndex;
-                  if (targetLineIndex === undefined) {
-                    console.log(`🚰 JIT: Hydrating target chapter ${index} before jump...`);
+          chapters.map((chapter, index) => (
+            <Button
+              autoFocus={index === viewChapter?.chapterIndex}
+              variant={index === viewChapter?.chapterIndex ? 'secondary' : 'ghost'}
+              key={`chapter-${index}`}
+              value={index}
+              disabled={!chapter.isLoaded}
+              onClick={async () => {
+                const chapter = chapters[index];
+                if (!chapter) return;
+                let targetLineIndex = chapter.startIndex;
+                if (targetLineIndex === undefined) {
+                  console.log(`🚰 JIT: Hydrating target chapter ${index} before jump...`);
 
-                    // This call should return the updated book with the new startIndex
-                    const updatedBook = await hydrateChapterByIndex(index);
-                    if (updatedBook && updatedBook.chapters[index].startIndex) {
-                      targetLineIndex = updatedBook.chapters[index].startIndex;
-                    } else {
-                      return;
-                    }
+                  // This call should return the updated book with the new startIndex
+                  const updatedBook = await hydrateChapterByIndex(index);
+                  if (updatedBook && updatedBook.chapters[index].startIndex) {
+                    targetLineIndex = updatedBook.chapters[index].startIndex;
+                  } else {
+                    return;
                   }
-                  await jumpToIndex(targetLineIndex);
-                  setSelectedBookmark(undefined);
-                }}
-                title={chapter.title}
-                className="w-full justify-start px-2! py-2! h-auto! focus:ring-0 focus-visible:ring-0"
-              >
-                <span className="w-full text-wrap text-left font-normal!">{chapter.title}</span>
-              </Button>
-            ))}
+                }
+                await jumpToIndex(targetLineIndex);
+                setSelectedBookmark(undefined);
+              }}
+              title={chapter.title}
+              className="w-full justify-start px-2! py-2! h-auto! focus:ring-0 focus-visible:ring-0"
+            >
+              <span className="w-full text-wrap text-left font-normal!">{chapter.title}</span>
+            </Button>
+          ))}
         {index === 1 &&
           bookmarks?.length > 0 &&
           bookmarks.map((bookmark) => (
@@ -417,7 +415,7 @@ export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeft
               <span className="w-full text-wrap text-left font-normal!">{highlight.texts.join(' ')}</span>
             </Button>
           ))}
-      </div>
+      </SidePanelContent>
     </SidePanel>
   );
 };
@@ -523,7 +521,6 @@ export const SidePanelRight = ({ open, onClose }: BookSidePanelProps) => {
                     size="icon"
                     variant="link"
                     onClick={(e) => {
-                      e.stopPropagation();
                       e.preventDefault();
                       toggleChapter(res.index, res.text);
                     }}
@@ -539,7 +536,6 @@ export const SidePanelRight = ({ open, onClose }: BookSidePanelProps) => {
                     size="icon"
                     variant="link"
                     onClick={async (e) => {
-                      e.stopPropagation();
                       e.preventDefault();
                       await deleteLine(res.index);
                     }}
@@ -558,13 +554,13 @@ export const SidePanelRight = ({ open, onClose }: BookSidePanelProps) => {
 
   return (
     <SidePanel direction="right" open={open} onClose={onClose} className="px-2">
-      <div className="relative flex flex-wrap mb-2 md:justify-end items-center text-sm text-muted-foreground">
+      <SidePanelHeader className="md:justify-end">
         <Button size="icon" variant={index === 0 ? 'default' : 'outline'} onClick={() => selectTab(0)}>
           <CaseSensitive strokeWidth={1.5} className="w-5! h-5!" />
         </Button>
-      </div>
+      </SidePanelHeader>
 
-      <div className="no-scrollbar overflow-y-auto overflow-x-hidden flex flex-col items-start [&_button]:rounded-none!">
+      <SidePanelContent>
         {index === 0 && (
           <div className="flex flex-col gap-4">
             {/* Mode */}
@@ -743,7 +739,7 @@ export const SidePanelRight = ({ open, onClose }: BookSidePanelProps) => {
             <div className="grow" />
           </div>
         )}
-      </div>
+      </SidePanelContent>
     </SidePanel>
   );
 };

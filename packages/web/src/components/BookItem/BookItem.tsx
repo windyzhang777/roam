@@ -2,7 +2,6 @@ import { BindingLine, BookItemContextMenu, BookItemPlaceholder } from '@/compone
 import { Button } from '@/components/ui/button';
 import { bookTitleWithAuthor, calculateProgress, formatLocaleDateString, type Book, type BookAction } from '@audiobook/shared';
 import { BadgeCheck, BellRing, CircleChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 interface BookItemProps {
   book: Book;
@@ -12,12 +11,11 @@ interface BookItemProps {
   updateChapters: () => Promise<Book | null>;
   canAction: BookAction['type'];
   openAction: (type: BookAction['type'], book: Book) => void;
+  onPress: () => void;
 }
 
-export const BookItem = ({ book, isSelected, selectBook, hasNewChapters, updateChapters, canAction, openAction }: BookItemProps) => {
-  const navigate = useNavigate();
+export const BookItem = ({ book, isSelected, selectBook, hasNewChapters, updateChapters, canAction, openAction, onPress }: BookItemProps) => {
   const coverPath = book?.coverPath ? (book.coverPath.startsWith('blob:') || book.coverPath.startsWith('data:') ? book.coverPath : `${import.meta.env.VITE_API_URL}${book.coverPath}`) : '';
-
   const progress = calculateProgress(book.currentLine, book.totalLines);
 
   return (
@@ -27,12 +25,12 @@ export const BookItem = ({ book, isSelected, selectBook, hasNewChapters, updateC
       key={`book-${book._id}`}
       aria-label={`Book ${book._id}`}
       onClick={selectBook}
-      onDoubleClick={() => navigate(`/book/${book._id}`)}
+      onDoubleClick={onPress}
       onKeyDown={(e) => {
         e.stopPropagation();
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          navigate(`/book/${book._id}`);
+          onPress();
         }
       }}
       title={bookTitleWithAuthor(book)}

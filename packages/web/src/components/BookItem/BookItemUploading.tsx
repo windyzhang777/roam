@@ -9,7 +9,6 @@ interface BookItemUploadingProps {
 
 export const BookItemUploading = ({ upload, onRemove }: BookItemUploadingProps) => {
   const { id, fileName, status, progress, error, book } = upload;
-  const percentage = Math.round(progress.percentage);
   const coverPath = book?.coverPath ? (book.coverPath.startsWith('blob:') || book.coverPath.startsWith('data:') ? book.coverPath : `${import.meta.env.VITE_API_URL}${book.coverPath}`) : '';
 
   return (
@@ -52,16 +51,14 @@ export const BookItemUploading = ({ upload, onRemove }: BookItemUploadingProps) 
       {/* Progress Indicator */}
       {status === 'uploading' && (
         <span className="absolute bottom-3.5 left-2 w-full text-[10px] text-muted-foreground flex items-center gap-1 text-left pointer-events-none">
-          <span className="w-full truncate justify-start animate-pulse">Uploading {percentage}%</span>
+          <span className="w-full truncate justify-start animate-pulse">{Math.round(progress.percentage)}% uploaded</span>
         </span>
       )}
 
       {/* Error Indicator */}
       {status === 'error' && (
-        <span className="absolute bottom-3.5 left-2 w-full text-[10px] text-destructive flex items-center gap-1 text-left pointer-events-none">
-          <span title={error || 'Upload failed'} className="w-full truncate justify-start">
-            {error || 'Upload failed'}
-          </span>
+        <span title={error || 'Upload failed'} className="absolute bottom-0.5 left-2 text-[10px] text-destructive line-clamp-3 text-center">
+          {error || 'Upload failed'}
         </span>
       )}
     </div>

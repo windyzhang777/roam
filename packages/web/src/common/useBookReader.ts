@@ -165,6 +165,17 @@ export function useBookReader(_id: string | undefined) {
     if (!confirm(`Delete line ${index}: ${lines[index].length > MAX_BOOKMARK_TEXT ? lines[index].slice(0, MAX_BOOKMARK_TEXT) + '...' : lines[index]}?`)) return;
 
     setLines((prev) => prev.map((line, i) => (i === index ? DELETE_MARKER + line : line)));
+    setChapters((prev) => prev.filter((c) => c.startIndex !== index && c.source !== String(index)));
+    setBookmarks((prev) => prev.filter((b) => b.index !== index));
+    setHighlights((prev) =>
+      prev
+        .map((h) => ({
+          ...h,
+          indices: h.indices.filter((idx) => idx !== index),
+          texts: h.texts.filter((_, i) => h.indices[i] !== index),
+        }))
+        .filter((h) => h.indices.length > 0),
+    );
     showToaster(
       renderDeleteToaster(index, async () => {
         hideToaster();
