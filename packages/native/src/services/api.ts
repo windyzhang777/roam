@@ -1,0 +1,268 @@
+import { BookSetting, ChunkedUploadConfig, SearchMatch, type Book, type BookContentPaginated } from '@audiobook/shared';
+import { DocumentPickerAsset } from 'expo-document-picker';
+import EventSource from 'react-native-sse';
+import { ChunkedUploader } from './ChunkedUploader';
+import { BASE_URL } from './config';
+
+interface FetchOptions extends RequestInit {
+  timeout?: number;
+}
+
+const fetchWithTimeout = async (url: string, options: FetchOptions = {}) => {
+  const { timeout = 8000 } = options;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(`${BASE_URL}${url}`, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    return response;
+  } catch (error) {
+    clearTimeout(timer);
+    throw error;
+  }
+};
+
+const getErrorMessage = async (response: Response, message?: string): Promise<string> => {
+  try {
+    const json = await response.json();
+    return json.message || json.error || message || 'Unknown error';
+  } catch {
+    return message || response.statusText || 'Request failed';
+  }
+};
+
+export const api = {
+  books: {
+    /**
+     * Scrape using SSE (adapted for Native)
+     */
+    scrape: (url: string, onProgress: (progress: any) => void, onComplete: (book: Book) => void, onError: (error: string) => void) => {
+      const eventSource = new EventSource(`${BASE_URL}/api/books/scrape?url=${encodeURIComponent(url)}`);
+
+      eventSource.addEventListener('message', (event) => {
+        try {
+          const data = JSON.parse(event.data as string);
+
+          if (data.error) {
+            onError(data.error);
+            eventSource.close();
+          } else if (data.complete) {
+            onComplete(data.book);
+            eventSource.close();
+          } else if (data.message) {
+            onProgress({ message: data.message });
+          } else {
+            onProgress({
+              message: data.title,
+              percentage: (data.current / data.total) * 100,
+            });
+          }
+        } catch (error) {
+          onError('Failed to parse server response');
+          eventSource.close();
+        }
+      });
+
+      eventSource.addEventListener('error', () => {
+        onError('Connection to scraping server lost');
+        eventSource.close();
+      });
+
+      return () => eventSource.close();
+    },
+
+    hydrateChapter: async (_id: string, chapterIndex: number): Promise<Book | null> => {
+      const response = await fetchWithTimeout(`/api/books/${_id}/hydrate/${chapterIndex}`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const errorMessage = await getErrorMessage(response, `Failed to hydrate for chapter ${chapterIndex} for book ${_id}`);
+        throw new Error(errorMessage);
+      }
+
+      return response.json();
+    },
+
+    /**
+     * Truncates the book from this chapter index and re-fetches content and metadata.
+     */
+    reHydrateFromChapter: async (_id: string, chapterIndex: number): Promise<Book | null> => {
+      const response = await fetchWithTimeout(`/api/books/${_id}/rehydrate/${chapterIndex}`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const errorMessage = await getErrorMessage(response, `Failed to re-hydrate from chapter ${chapterIndex}`);
+        throw new Error(errorMessage);
+      }
+
+      return response.json();
+    },
+
+    /**
+     * Checks all web books for new chapters
+     * Returns a map of { [bookId: string]: numberOfNewChapters }
+     */
+    checkUpdates: async (): Promise<Record<string, number>> => {
+      const response = await fetchWithTimeout('/api/books/check-updates');
+
+      if (!response.ok) {
+        const errorMessage = await getErrorMessage(response, 'Failed to check chapter updates');
+        throw new Error(errorMessage);
+      }
+
+      return response.json();
+    },
+
+    /**
+     * Refresh a specific book's chapter list
+     */
+    updateChapters: async (_id: string): Promise<Book> => {
+      const response = await fetchWithTimeout(`/api/books/${_id}/refresh`, { method: 'POST' });
+
+      if (!response.ok) {
+        const errorMessage = await getErrorMessage(response, `Failed to update chapters for book ${_id}`);
+        throw new Error(errorMessage);
+      }
+
+      return response.json();
+    },
+
+    updateWithCover: async (_id: string, updates: Partial<Book>, file: File | null): Promise<Book> => {
+      const formData = new FormData();
+
+      formData.append('title', updates.title || '');
+      formData.append('author', updates.author || '');
+      formData.append('coverPath', updates.coverPath || '');
+      if (file) formData.append('cover', file);
+
+      const response = await fetchWithTimeout(`/api/books/${_id}/upload`, {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorMessage = await getErrorMessage(response);
+        throw new Error(errorMessage);
+      }
+
+      return response.json();
+    },
+
+    update: async (_id: string, updates: Partial<Book>): Promise<Book> => {
+      console.log(`update`);
+      const response = await fetchWithTimeout(`/api/books/${_id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...updates }),
+        keepalive: true,
+      });
+
+      if (!response.ok) {
+        const errorMessage = await getErrorMessage(response, `Failed to update for book ${_id}`);
+        throw new Error(errorMessage);
+      }
+      return response.json();
+    },
+
+    getAll: async (): Promise<Book[]> => {
+      const response = await fetchWithTimeout('/api/books');
+
+      if (!response.ok) {
+        const errorMessage = await getErrorMessage(response);
+        throw new Error(errorMessage);
+      }
+      return response.json();
+    },
+
+    getById: async (_id: string): Promise<Book> => {
+      const response = await fetchWithTimeout(`/api/books/${_id}`);
+
+      if (!response.ok) {
+        const errorMessage = await getErrorMessage(response);
+        throw new Error(errorMessage);
+      }
+      return response.json();
+    },
+
+    getContent: async (_id: string, offset: number, limit: number): Promise<BookContentPaginated> => {
+      const response = await fetchWithTimeout(`/api/books/${_id}/content?offset=${offset}&limit=${limit}`);
+
+      if (!response.ok) {
+        const errorMessage = await getErrorMessage(response);
+        throw new Error(errorMessage);
+      }
+      return response.json();
+    },
+
+    getSetting: async (_id: string): Promise<BookSetting> => {
+      const response = await fetchWithTimeout(`/api/books/${_id}/setting`);
+
+      if (!response.ok) {
+        const errorMessage = await getErrorMessage(response);
+        throw new Error(errorMessage);
+      }
+      return response.json();
+    },
+
+    updateSetting: async (_id: string, updates: Partial<BookSetting>): Promise<BookSetting> => {
+      console.log(`updateSetting`);
+      const response = await fetchWithTimeout(`/api/books/${_id}/setting`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...updates }),
+        keepalive: true,
+      });
+
+      if (!response.ok) {
+        const errorMessage = await getErrorMessage(response, `Failed to update setting for book ${_id}`);
+        throw new Error(errorMessage);
+      }
+      return response.json();
+    },
+
+    search: async (_id: string, query: string): Promise<{ count: number; matches: SearchMatch[] }> => {
+      const response = await fetchWithTimeout(`/api/books/${_id}/search?q=${query}`);
+
+      if (!response.ok) {
+        const errorMessage = await getErrorMessage(response);
+        throw new Error(errorMessage);
+      }
+      return response.json();
+    },
+
+    deleteLine: async (_id: string, lineIndex: number) => {
+      await fetchWithTimeout(`/api/books/${_id}/content?line=${lineIndex}`, {
+        method: 'DELETE',
+      });
+    },
+
+    restoreLine: async (_id: string, lineIndex: number) => {
+      await fetchWithTimeout(`/api/books/${_id}/content?line=${lineIndex}`, {
+        method: 'POST',
+      });
+    },
+
+    delete: async (_id: string): Promise<void> => {
+      await fetchWithTimeout(`/api/books/${_id}`, { method: 'DELETE' });
+    },
+  },
+  upload: {
+    /**
+     * Upload book with chunked upload (recommended for files > 1MB)
+     */
+    upload: async (file: DocumentPickerAsset, config?: Partial<ChunkedUploadConfig>) => {
+      const uploader = new ChunkedUploader(file, config);
+      return { bookPromise: uploader.upload(), uploader };
+    },
+  },
+};

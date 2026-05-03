@@ -34,7 +34,7 @@ export const BookItem = ({ book, isSelected, selectBook, hasNewChapters, updateC
         }
       }}
       title={bookTitleWithAuthor(book)}
-      className={`relative aspect-3/5 w-40 rounded-md overflow-hidden pt-8 pb-10 px-2 ${isSelected ? 'bg-muted-foreground/10' : ''} transition-all cursor-pointer group`}
+      className={`relative aspect-4/7 w-40 rounded-md overflow-hidden pt-8 pb-10 px-2 ${isSelected ? 'bg-muted-foreground/10' : ''} transition-all cursor-pointer group`}
     >
       <div className="relative w-full h-full overflow-hidden">
         {book.coverPath ? (

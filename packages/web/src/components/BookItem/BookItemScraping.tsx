@@ -4,15 +4,15 @@ import { CircleMinus } from 'lucide-react';
 
 interface BookItemScrapingProps {
   scrape: ScrapingBook;
-  onRemove: (id: string) => void;
+  onRemove: () => void;
 }
 
 export const BookItemScraping = ({ scrape, onRemove }: BookItemScrapingProps) => {
-  const { id, title, status, progress, error, book } = scrape;
+  const { title, status, progress, error, book } = scrape;
   const coverPath = book?.coverPath ? (book.coverPath.startsWith('blob:') || book.coverPath.startsWith('data:') ? book.coverPath : `${import.meta.env.VITE_API_URL}${book.coverPath}`) : '';
 
   return (
-    <div role="status" key={`scraping-${title}`} aria-label={`scraping ${title}`} className={`relative aspect-3/5 w-40 rounded-md overflow-hidden pt-8 pb-10 px-2 transition-all cursor-pointer group`}>
+    <div role="status" key={`scraping-${title}`} aria-label={`scraping ${title}`} className={`relative aspect-4/7 w-40 rounded-md overflow-hidden pt-8 pb-10 px-2 transition-all cursor-pointer group`}>
       <div className="relative w-full h-full overflow-hidden">
         {coverPath ? (
           <>
@@ -27,12 +27,12 @@ export const BookItemScraping = ({ scrape, onRemove }: BookItemScrapingProps) =>
         {(status === 'scraping' || status === 'error') && (
           <div
             tabIndex={0}
-            onClick={() => onRemove(id)}
+            onClick={onRemove}
             onKeyDown={(e) => {
               e.stopPropagation();
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                onRemove(id);
+                onRemove();
               }
             }}
             title={`${status === 'error' ? 'Remove' : 'Cancel scrape'}`}

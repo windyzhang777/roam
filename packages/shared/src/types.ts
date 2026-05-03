@@ -1,4 +1,4 @@
-type BookSource = 'local' | 'web';
+export type BookSource = 'local' | 'web';
 
 export type BookFileType = 'txt' | 'epub' | 'pdf' | 'mobi' | 'web';
 

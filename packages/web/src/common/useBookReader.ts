@@ -32,7 +32,7 @@ export function useBookReader(_id: string | undefined) {
       JSON.stringify({ currentLine: book?.currentLine, lastCompleted: book?.lastCompleted, chapters: book?.chapters, bookmarks: book?.bookmarks, highlights: book?.highlights });
 
   const isFetchingRef = useRef(false);
-  const canFetch = useMemo(() => _id && hasMore, [_id, hasMore]);
+  const canFetch = useMemo(() => !!_id && !!hasMore, [_id, hasMore]);
 
   const updateCurrentLine = useCallback((index: number) => {
     currentLineRef.current = index;

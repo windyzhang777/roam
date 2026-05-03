@@ -1,7 +1,7 @@
 import { useSaveToLocal } from '@/common/useSaveToLocal';
 import useScroll from '@/common/useScroll';
 import { Button } from '@/components//ui/button';
-import { useTheme } from '@/components/theme-provider';
+import { useThemeContext } from '@/components/theme-provider';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { SidePanel, SidePanelContent, SidePanelHeader } from '@/components/ui/SidePanel';
 import { Slider } from '@/components/ui/slider';
@@ -428,7 +428,7 @@ export const SidePanelRight = ({ open, onClose }: BookSidePanelProps) => {
     setIndex(index);
   };
 
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useThemeContext();
   const { chapters, toggleChapter, deleteLine } = useBookContext();
   const { lines } = useContentContext();
   const { readingMode } = useCommonContext();

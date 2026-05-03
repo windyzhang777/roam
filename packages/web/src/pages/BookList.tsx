@@ -7,7 +7,7 @@ import { Button } from '@/components//ui/button';
 import { BookItem, BookItemUploading, ConfirmModal, EditBookInfo } from '@/components/BookItem';
 import { ScrapeBookModal } from '@/components/BookItem/BookItemModal';
 import { BookItemScraping } from '@/components/BookItem/BookItemScraping';
-import { useTheme } from '@/components/theme-provider';
+import { useThemeContext } from '@/components/theme-provider';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { FEATURES } from '@/config/features';
 import { getBookActionLabel, type Book } from '@audiobook/shared';
@@ -24,7 +24,7 @@ export const BookList = () => {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
   // theme hook
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useThemeContext();
 
   // data hook
   const { books, loading, updateBook, deleteBook, addBook } = useBooks();
@@ -153,7 +153,6 @@ export const BookList = () => {
         </div>
       )}
 
-      {/* Books To Read */}
       <div className="py-2 flex flex-wrap gap-2 justify-center md:justify-start">
         {/* Uploading Books */}
         {uploads.map((upload) => (
@@ -177,8 +176,8 @@ export const BookList = () => {
             }}
           />
         ))}
-        {/* Books to read */}
-        {booksToRead.length === 0 && uploads.length === 0 && scrapes.length === 0 && booksCompleted.length > 0 && (
+        {/* Books to Read */}
+        {booksToRead.length === 0 && uploads.length === 0 && scrapes.length === 0 && (
           <div className="text-center text-gray-500 col-span-full">
             <BookOpen className="mx-auto mb-4 opacity-50" />
             <p>Upload a new book!</p>

@@ -1,7 +1,9 @@
-import { Book, BookContent, Chapter, CHAPTER_MARKER, fixEncodingTxt, IMAGE_MARKER, localeByLang } from '@audiobook/shared';
+import { Book, BookContent, Chapter, CHAPTER_MARKER, IMAGE_MARKER, localeByLang } from '@audiobook/shared';
+import chardet from 'chardet';
 import { EPub } from 'epub2';
 import { franc } from 'franc';
 import fs from 'fs';
+import iconv from 'iconv-lite';
 import path from 'path';
 import { extractText, getDocumentProxy } from 'unpdf';
 import { uploadsDir } from '../index';
@@ -116,7 +118,7 @@ export class TextProcessorService {
   }
 
   private async processTxt(title: string, filePath: string) {
-    const fullText = fixEncodingTxt(filePath);
+    const fullText = this.encodingTxt(filePath);
     const { lang, lines } = await this.processBookText(fullText);
     return { lang, lines, chapters: [{ title, source: '0', isLoaded: true, startIndex: 0 }] };
   }
@@ -314,6 +316,22 @@ export class TextProcessorService {
       }
     }
     return imageMap;
+  }
+
+  private encodingTxt(filePath: string) {
+    const buffer = fs.readFileSync(filePath);
+    const encoding = chardet.detect(buffer) || 'utf-8';
+    console.log(`[TXT Parser] Detected encoding: ${encoding} for ${filePath}`);
+
+    let fullText = '';
+    try {
+      fullText = iconv.decode(buffer, encoding);
+    } catch (error) {
+      fullText = iconv.decode(buffer, 'gbk');
+      console.warn(`⚠️ [TXT Parser] Failed to decode with ${encoding}, fallback to GBK for ${filePath}`);
+    }
+
+    return fullText;
   }
 
   private deleteFile = async (rawPath: string | undefined) => {

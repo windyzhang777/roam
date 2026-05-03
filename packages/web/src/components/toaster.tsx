@@ -1,4 +1,4 @@
-import { Button } from '@/components//ui/button';
+import { Button } from '@/components/ui/button';
 import type { Chapter } from '@audiobook/shared';
 import { AudioLines, Undo } from 'lucide-react';
 

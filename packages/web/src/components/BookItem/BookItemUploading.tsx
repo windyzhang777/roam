@@ -4,11 +4,11 @@ import { CircleMinus } from 'lucide-react';
 
 interface BookItemUploadingProps {
   upload: UploadingBook;
-  onRemove: (id: string) => void;
+  onRemove: () => void;
 }
 
 export const BookItemUploading = ({ upload, onRemove }: BookItemUploadingProps) => {
-  const { id, fileName, status, progress, error, book } = upload;
+  const { fileName, status, progress, error, book } = upload;
   const coverPath = book?.coverPath ? (book.coverPath.startsWith('blob:') || book.coverPath.startsWith('data:') ? book.coverPath : `${import.meta.env.VITE_API_URL}${book.coverPath}`) : '';
 
   return (
@@ -16,7 +16,7 @@ export const BookItemUploading = ({ upload, onRemove }: BookItemUploadingProps) 
       role="status"
       key={`uploading-${fileName}`}
       aria-label={`Uploading ${fileName}`}
-      className={`relative aspect-3/5 w-40 rounded-md overflow-hidden pt-8 pb-10 px-2 transition-all cursor-pointer group`}
+      className="relative aspect-4/7 w-40 rounded-md overflow-hidden pt-8 pb-10 px-2 transition-all cursor-pointer group"
     >
       <div className="relative w-full h-full overflow-hidden">
         {coverPath ? (
@@ -32,12 +32,12 @@ export const BookItemUploading = ({ upload, onRemove }: BookItemUploadingProps) 
         {(status === 'uploading' || status === 'error') && (
           <div
             tabIndex={0}
-            onClick={() => onRemove(id)}
+            onClick={onRemove}
             onKeyDown={(e) => {
               e.stopPropagation();
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                onRemove(id);
+                onRemove();
               }
             }}
             title={`${status === 'error' ? 'Remove' : 'Cancel upload'}`}

@@ -1,6 +1,3 @@
-import chardet from 'chardet';
-import fs from 'fs';
-import iconv from 'iconv-lite';
 import { CHAPTER_MARKER, DELETE_MARKER, IMAGE_MARKER } from './constants';
 import type { Book, BookFileType } from './types';
 
@@ -63,22 +60,6 @@ export const fixEncoding = (str: string): string => {
     console.error(`❌ Failed to fix encoding for ${str}:`, error);
     return str;
   }
-};
-
-export const fixEncodingTxt = (filePath: string) => {
-  const buffer = fs.readFileSync(filePath);
-  const encoding = chardet.detect(buffer) || 'utf-8';
-  console.log(`[TXT Parser] Detected encoding: ${encoding} for ${filePath}`);
-
-  let fullText = '';
-  try {
-    fullText = iconv.decode(buffer, encoding);
-  } catch (error) {
-    fullText = iconv.decode(buffer, 'gbk');
-    console.warn(`⚠️ [TXT Parser] Failed to decode with ${encoding}, fallback to GBK for ${filePath}`);
-  }
-
-  return fullText;
 };
 
 export const isValidFileType = (fileType: string): boolean => {
