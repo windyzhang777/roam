@@ -102,6 +102,12 @@ export class TextProcessorService {
     return { lang, lines };
   }
 
+  async processBookTextTxt(text: string) {
+    const lang = this.detectLanguage(text);
+    const lines = await this.splitTextIntoLines(text, lang);
+    return { lang, lines };
+  }
+
   async processBookData(bookId: string, title: string, filePath: string, fileType: string): Promise<ProcessedBook> {
     switch (fileType) {
       case 'txt':
@@ -119,7 +125,7 @@ export class TextProcessorService {
 
   private async processTxt(title: string, filePath: string) {
     const fullText = this.encodingTxt(filePath);
-    const { lang, lines } = await this.processBookText(fullText);
+    const { lang, lines } = await this.processBookTextTxt(fullText);
     return { lang, lines, chapters: [{ title, source: '0', isLoaded: true, startIndex: 0 }] };
   }
 

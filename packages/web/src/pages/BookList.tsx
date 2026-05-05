@@ -91,7 +91,7 @@ export const BookList = () => {
   }
 
   return (
-    <div className="min-h-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto pt-8 pb-30 px-6 flex flex-col text-sm">
+    <div className="min-h-full w-full pt-8 pb-30 px-8 md:px-20 xl:px-[20%] flex flex-col text-sm bg-background">
       {/* Theme Settings */}
       <header className="text-center mb-4 flex justify-between items-center ">
         <div className="grow" />

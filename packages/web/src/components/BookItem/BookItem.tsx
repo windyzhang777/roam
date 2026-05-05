@@ -62,9 +62,9 @@ export const BookItem = ({ book, isSelected, selectBook, hasNewChapters, updateC
             e.stopPropagation();
             updateChapters();
           }}
-          className="absolute top-9.5 left-3.5 h-7 w-7 rounded-full! shake-active bg-white text-amber-600"
+          className="absolute top-9.5 left-3.5 h-7 w-7 rounded-full! bg-white text-amber-600"
         >
-          <BellRing />
+          <BellRing className="shake-active" />
         </Button>
       ) : null}
 

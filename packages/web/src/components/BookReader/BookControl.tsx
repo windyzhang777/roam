@@ -48,7 +48,7 @@ export const BookControl = ({ setOpenPanelLeft }: BookControlProps) => {
         <Button size="icon" variant="ghost" id="jump-to-read" title="Previous Line" onClick={prevLine}>
           <RotateCcw />
         </Button>
-        <Button variant="ghost" id={isPlaying ? 'pause' : 'play'} onClick={handlePlayPause} title={isPlaying ? 'Pause' : 'Play'} className="bg-primary">
+        <Button id={isPlaying ? 'pause' : 'play'} onClick={handlePlayPause} title={isPlaying ? 'Pause' : 'Play'} className="hover:bg-muted-foreground">
           {isPlaying ? <Pause className="fill-background stroke-background" /> : <Play className="fill-background stroke-background" />}
         </Button>
         <Button size="icon" variant="ghost" id="jump-to-read" title="Previous Line" onClick={nextLine}>

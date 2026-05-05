@@ -1,16 +1,19 @@
 import { useBookContext, useCommonContext, useSearchContext, useSettingContext, useViewLineContext } from '@/config/contexts';
+import { FEATURES } from '@/config/features';
 import { cn } from '@/lib/utils';
 import { wordHighlightStore, type WordHighlight } from '@/stores/wordHighlightStore';
 import { CHAPTER_MARKER, DELETE_MARKER, escapeRegExp, IMAGE_MARKER, removeMarker } from '@audiobook/shared';
+import { Bookmark } from 'lucide-react';
 import React, { useCallback, useSyncExternalStore } from 'react';
+import { Button } from '../ui/button';
 
 interface BookLineProps extends React.HTMLAttributes<HTMLLIElement> {
   index: number;
   line: string;
 }
 
-export const BookLine = ({ index, line }: BookLineProps) => {
-  const { currentLine, book, chapters, bookmarks, highlights } = useBookContext();
+const BookLine_ = ({ index, line }: BookLineProps) => {
+  const { currentLine, book, chapters, bookmarks, highlights, toggleBookmark } = useBookContext();
   const { viewLine } = useViewLineContext();
   const { readingMode, handleLineClick } = useCommonContext();
   const { searchText, searchRes, currentMatch } = useSearchContext();
@@ -85,7 +88,7 @@ export const BookLine = ({ index, line }: BookLineProps) => {
             <mark
               key={i}
               className={cn(
-                'rounded-md outline-none',
+                'rounded-md outline-none text-foreground',
                 isCurrentMatch ? 'bg-primary' : isHightlight ? 'underline decoration-wavy decoration-primary underline-offset-1 bg-transparent' : 'bg-highlight',
               )}
               aria-current={isCurrentMatch ? 'true' : undefined}
@@ -120,13 +123,32 @@ export const BookLine = ({ index, line }: BookLineProps) => {
       }}
       style={{ paddingTop: paragraphSpacing + 'ch', paddingBottom: paragraphSpacing + 'ch' }}
       className={cn(
-        `group relative cursor-pointer my-1 px-2 transition-colors duration-200 ease-in-out rounded-lg`,
+        `group relative cursor-pointer my-1 pl-2 pr-4 transition-colors duration-200 ease-in-out rounded-lg border-r-4`,
         index === currentLine ? 'bg-highlight font-medium' : index === viewLine ? 'bg-sidebar-accent' : 'hover:bg-sidebar-accent',
         isChapter ? 'font-semibold italic text-center uppercase tracking-widest' : '',
-        isBookmarked ? 'border border-r-4 border-primary pr-2' : 'border-r-4 border-transparent',
+        isBookmarked ? 'bookmark-shadow border-primary' : 'border-transparent',
       )}
     >
       {searchText && readingMode === 'search' ? renderLine(cleanLine, searchText) : renderLine(cleanLine, highlightTexts[0], true)}
+
+      {FEATURES.ENABLE_BOOKMARK_EDIT && (
+        <Button
+          size="icon"
+          variant="ghost"
+          tabIndex={index === currentLine ? 0 : -1}
+          aria-label={`${isBookmarked ? 'Remove' : 'Add'} bookmark for line ${index + 1}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleBookmark(index, cleanLine);
+          }}
+          title={isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'}
+          className={cn('w-6 h-6 absolute right-0 bottom-0 bg-transparent hover:bg-transparent', 'opacity-0 hover:opacity-100', isBookmarked ? 'opacity-100' : 'group-hover:opacity-60')}
+        >
+          <Bookmark strokeWidth={1} className={cn('fill-primary stroke-primary block', isBookmarked && 'shake-active')} />
+        </Button>
+      )}
     </li>
   );
 };
+
+export const BookLine = BookLine_;
