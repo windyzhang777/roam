@@ -45,42 +45,10 @@ export default function useBookNavigation(currentLine: number, lines: string[], 
   }, []);
 
   const userJump = useCallback(() => {
+    console.log(`userJump`);
     isSearchJumpingRef.current = true;
     startTimer(() => (isSearchJumpingRef.current = false), 300);
   }, [startTimer]);
-
-  const scrollToLine = useCallback(
-    (index: number, behavior: LocationOptions['behavior'] = 'auto') => {
-      console.log(`scrollToLine :`, behavior);
-      if (options?.pageView && options.pageView !== 'scroll' && options?.goToLineRef?.current) {
-        options.goToLineRef.current(index);
-        return;
-      }
-      virtuosoRef.current?.scrollToIndex({ index, align: 'start', behavior, offset: -20 });
-    },
-    [options.goToLineRef, options.pageView],
-  );
-
-  const jumpToRead = (index: number) => {
-    scrollToLine(index);
-    if (viewLineRef.current !== index) updateViewLine(index);
-    ttsScroll();
-  };
-
-  const jumpToIndex = async (index: number | undefined, shouldRead: boolean = false) => {
-    if (index === undefined) return;
-
-    if (index >= lines.length) {
-      await loadMoreLines(0, index + PAGE_SIZE);
-    }
-
-    shouldReadViewLineRef.current = shouldRead;
-    startAnimationFrame(() => scrollToLine(index));
-    userJump();
-    userScroll();
-
-    if (viewLineRef.current !== index) updateViewLine(index);
-  };
 
   const checkLineVisibility = useCallback((index: number) => {
     const scroller = scrollerRef.current;
@@ -94,6 +62,43 @@ export default function useBookNavigation(currentLine: number, lines: string[], 
     const isVisible = itemRect.top >= scrollerRect.top && itemRect.bottom <= scrollerRect.bottom;
     return isVisible;
   }, []);
+
+  const scrollToLine = useCallback(
+    (index: number, behavior: LocationOptions['behavior'] = 'auto') => {
+      if (options?.pageView && options.pageView !== 'scroll' && options?.goToLineRef?.current) {
+        options.goToLineRef.current(index);
+        return;
+      }
+      const isVisible = checkLineVisibility(index);
+      if (isVisible) return;
+      console.log(`scrollToLine :`, index, behavior);
+      startTimer(() => virtuosoRef.current?.scrollToIndex({ index, align: 'start', behavior, offset: -20 }), 100);
+    },
+    [options.goToLineRef, options.pageView, startTimer, checkLineVisibility],
+  );
+
+  const jumpToRead = (index: number) => {
+    console.log(`jumpToRead`);
+    scrollToLine(index);
+    if (viewLineRef.current !== index) updateViewLine(index);
+    ttsScroll();
+  };
+
+  const jumpToIndex = async (index: number | undefined, shouldRead: boolean = false) => {
+    if (index === undefined) return;
+    console.log(`jumpToIndex`);
+
+    if (index >= lines.length) {
+      await loadMoreLines(0, index + PAGE_SIZE);
+    }
+
+    shouldReadViewLineRef.current = shouldRead;
+    startAnimationFrame(() => scrollToLine(index));
+    userJump();
+    userScroll();
+
+    if (viewLineRef.current !== index) updateViewLine(index);
+  };
 
   const updateIsCurrentLineVisible = useCallback(() => {
     const isVisible = checkLineVisibility(currentLine);

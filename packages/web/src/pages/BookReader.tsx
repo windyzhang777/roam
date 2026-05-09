@@ -326,7 +326,7 @@ export const BookReader = () => {
               >
                 <SpeechContext.Provider value={{ isPlaying, play, pause, resume: () => resume(currentLineRef.current), stop }}>
                   <div className="h-full relative">
-                    <div className="flex flex-col h-[95%] overflow-hidden">
+                    <div className="flex flex-col gap-2 h-[95%] overflow-hidden">
                       <BookHeader searching={searching} setOpenPanelLeft={setOpenPanelLeft} setOpenPanelRight={setOpenPanelRight} />
 
                       {/* Start of Reading Area */}

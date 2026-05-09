@@ -23,6 +23,7 @@ function Slider({ id, className, defaultValue, value, min = 0, max = 100, ...pro
   const currentPercentage = currentLine !== undefined ? (currentLine / max) * 100 : undefined;
   const currentChapter = currentLine ? getChapter(currentLine, chapters) : undefined;
   const hoverChapter = hoverLine ? getChapter(hoverLine, chapters) : undefined;
+  const isToRead = Math.abs(currentLine - viewLine) < 10;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -101,7 +102,7 @@ function Slider({ id, className, defaultValue, value, min = 0, max = 100, ...pro
           key={index}
           className={cn(
             'z-20 relative block size-3 shrink-0 rounded-full border border-ring bg-white ring-ring/50 transition-[color,box-shadow] select-none after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:ring-3 disabled:pointer-events-none disabled:opacity-50',
-            id === 'progress' && Math.abs(currentLine - viewLine) < 10 ? 'bg-transparent border-transparent' : 'bg-white',
+            id === 'progress' && isToRead ? 'bg-transparent border-transparent' : 'bg-white',
           )}
         />
       ))}
