@@ -5,6 +5,7 @@ import {
   FONT_SIZE_DEFAULT,
   INDENT_DEFAULT,
   LINE_HEIGHT_DEFAULT,
+  PAGE_VIEW_DEFAULT,
   PARAGRAPH_SPACING_DEFAULT,
   RATE_DEFAULT,
   type BookSetting,
@@ -32,6 +33,7 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
   const [paragraphSpacing, setParagraphSpacing] = useState<NonNullable<BookSetting['paragraphSpacing']>>();
   const [indent, setIndent] = useState<NonNullable<BookSetting['indent']>>();
   const [alignment, setAlignment] = useState<NonNullable<BookSetting['alignment']>>();
+  const [pageView, setPageView] = useState<NonNullable<BookSetting['pageView']>>();
   const [voice, setVoice] = useState<VoiceOption['id']>(VOICE_FALLBACK.id);
 
   const availableVoices = useMemo(() => {
@@ -48,8 +50,8 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
   }, [availableVoices, voice]);
 
   const updates: Partial<BookSetting> = useMemo(
-    () => ({ fontSize, rate, voice: selectedVoice.id, lineHeight, paragraphSpacing, indent, alignment }),
-    [alignment, fontSize, lineHeight, paragraphSpacing, indent, rate, selectedVoice.id],
+    () => ({ fontSize, rate, voice: selectedVoice.id, lineHeight, paragraphSpacing, indent, alignment, pageView }),
+    [fontSize, lineHeight, paragraphSpacing, indent, alignment, pageView, rate, selectedVoice.id],
   );
 
   const canUpdate =
@@ -63,6 +65,7 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
         paragraphSpacing: setting?.paragraphSpacing,
         indent: setting?.indent,
         alignment: setting?.alignment,
+        pageView: setting?.pageView,
       });
 
   const updateBookSetting = async (_id: string, updates: Partial<BookSetting>) => {
@@ -93,6 +96,7 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
         setParagraphSpacing(() => setting.paragraphSpacing || PARAGRAPH_SPACING_DEFAULT);
         setIndent(() => setting.indent || INDENT_DEFAULT);
         setAlignment(() => setting.alignment || ALIGNMENT_DEFAULT);
+        setPageView(() => setting.pageView || PAGE_VIEW_DEFAULT);
       } catch (error) {
         console.error('❌ Failed to load setting: ', error);
       } finally {
@@ -119,6 +123,8 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
     setIndent,
     alignment,
     setAlignment,
+    pageView,
+    setPageView,
 
     flushSetting,
     availableVoices,

@@ -129,7 +129,12 @@ export const EditBookInfo = ({ open, onClose, title, onConfirm, book }: EditBook
             </div>
 
             <div className="grow" />
-            <Button variant="ghost" title="Remove Cover" onClick={() => setUpdates((prev) => ({ ...prev, coverPath: '' }))} className="w-5 h-5 text-black/50 hover:text-black transition-colors">
+            <Button
+              variant="ghost"
+              title="Remove Cover"
+              onClick={() => setUpdates((prev) => ({ ...prev, coverPath: '' }))}
+              className="w-5 h-5 text-muted-foreground/50 hover:text-black transition-colors"
+            >
               <Trash2 />
             </Button>
           </div>

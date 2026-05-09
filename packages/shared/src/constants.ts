@@ -1,3 +1,5 @@
+import { Alignment, PageView } from './types';
+
 export const MAX_UPLOAD_SIZE = 50 * 1024 * 1024; // 50MB
 export const UPLOAD_CHUNK_SIZE = 1 * 1024 * 1024; // 1MB
 
@@ -22,6 +24,8 @@ export const PARAGRAPH_SPACING_DEFAULT = 2;
 export const MIN_PARAGRAPH_SPACING = -0.5;
 export const MAX_PARAGRAPH_SPACING = 4;
 export const PARAGRAPH_SPACING_STEP = 0.05;
+export const ALIGNMENT_DEFAULT: Alignment = 'left';
+export const PAGE_VIEW_DEFAULT: PageView = 'scroll';
 
 export const INDENT_DEFAULT = 1;
 export const MIN_INDENT = 0;
@@ -32,8 +36,6 @@ export const RATE_DEFAULT = 1;
 export const MIN_RATE = 0.25;
 export const MAX_RATE = 5;
 export const RATE_STEP = 0.25;
-
-export const ALIGNMENT_DEFAULT = 'left';
 
 // timeout
 export const ONE_MINUTE = 60 * 1000;

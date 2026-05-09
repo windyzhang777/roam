@@ -13,6 +13,7 @@ import {
   FONT_SIZE_DEFAULT,
   INDENT_DEFAULT,
   LINE_HEIGHT_DEFAULT,
+  PAGE_VIEW_DEFAULT,
   RATE_DEFAULT,
   SearchMatch,
 } from '@audiobook/shared';
@@ -284,6 +285,7 @@ export class BookService {
         indent: INDENT_DEFAULT,
         rate: RATE_DEFAULT,
         alignment: ALIGNMENT_DEFAULT,
+        pageView: PAGE_VIEW_DEFAULT,
       }),
     ]);
 

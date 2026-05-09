@@ -16,9 +16,10 @@ import { wordHighlightStore } from '@/stores/wordHighlightStore';
 import { focusBody, getChapterIndex } from '@/utils';
 import { bookTitleWithAuthor, type BookMark } from '@audiobook/shared';
 import { ChevronRight, Loader, Loader2 } from 'lucide-react';
-import { forwardRef, useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
+import { BookPageView } from './BookPageView';
 
 export type ReadingMode = 'tts' | 'search' | 'edit';
 
@@ -80,9 +81,13 @@ export const BookReader = () => {
     setIndent,
     alignment,
     setAlignment,
+    pageView,
+    setPageView,
     flushSetting,
     availableVoices,
   } = useReaderSettings(_id, lang);
+
+  const goToLineRef = useRef<(lineIndex: number) => void | null>(null);
 
   // navigation hook
   const {
@@ -99,7 +104,7 @@ export const BookReader = () => {
     scrollToLine,
     jumpToRead,
     jumpToIndex,
-  } = useBookNavigation(currentLine, lines, loadMoreLines);
+  } = useBookNavigation(currentLine, lines, loadMoreLines, { pageView, goToLineRef });
 
   const startFromLine = useCallback(
     (index: number) => {
@@ -243,7 +248,7 @@ export const BookReader = () => {
 
   if (loading) {
     return (
-      <div aria-label="loading" className="min-h-full flex justify-center items-center gap-2">
+      <div aria-label="loading" className="h-full flex justify-center items-center gap-2">
         <Loader />
       </div>
     );
@@ -314,64 +319,71 @@ export const BookReader = () => {
                   setIndent,
                   alignment,
                   setAlignment,
+                  pageView,
+                  setPageView,
                   availableVoices,
                 }}
               >
                 <SpeechContext.Provider value={{ isPlaying, play, pause, resume: () => resume(currentLineRef.current), stop }}>
                   <div className="h-full relative">
-                    <div className="flex flex-col h-full overflow-hidden">
+                    <div className="flex flex-col h-[95%] overflow-hidden">
                       <BookHeader searching={searching} setOpenPanelLeft={setOpenPanelLeft} setOpenPanelRight={setOpenPanelRight} />
 
-                      {/* Start of Virtuoso */}
-                      <Virtuoso
-                        id="book-lines"
-                        ref={virtuosoRef}
-                        scrollerRef={(el) => (scrollerRef.current = el as HTMLElement)}
-                        className="flex-1 leading-loose transition-transform duration-500 ease-in-out"
-                        data={lines}
-                        initialTopMostItemIndex={{ index: 0, align: 'center' }}
-                        increaseViewportBy={200}
-                        endReached={(index) => {
-                          if (!canFetch || isFetchingRef.current || isSearchJumpingRef.current) return;
-                          if (index < lines.length - 1) return;
-                          loadMoreLines(lines.length);
-                        }}
-                        atBottomStateChange={(atBottom) => {
-                          if (!canFetch || isFetchingRef.current || !atBottom) return;
-                          loadMoreLines(lines.length);
-                        }}
-                        // rangeChanged={onRangeChange}
-                        components={{
-                          List: forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ style, children, ...props }, ref) => (
-                            <div
-                              {...props}
-                              ref={ref}
-                              tabIndex={0}
-                              onWheel={userScroll}
-                              onTouchMove={userScroll}
-                              className="outline-none list-none text-left mx-auto w-11/12 md:w-8/12"
-                              style={{ ...style, fontSize, lineHeight, textAlign: alignment, paddingLeft: indent + 'ch', paddingRight: indent + 'ch' }}
-                            >
-                              {children}
-                            </div>
-                          )),
-                          Footer: () => (
-                            <div className="h-20 w-full flex justify-center items-center text-sm text-gray-300">
-                              {loadingMore ? (
-                                <span className="flex justify-center items-center">
-                                  <Loader2 className="animate-spin mr-2" size={16} />
-                                  &nbsp;Loading more...
-                                </span>
-                              ) : !hasMore ? (
-                                <span>You've reach the end</span>
-                              ) : null}
-                            </div>
-                          ),
-                        }}
-                        // Individual Line Item
-                        itemContent={(index, line) => <BookLine index={index} line={line} />}
-                      />
-                      {/* End of Virtuoso */}
+                      {/* Start of Reading Area */}
+
+                      {pageView !== 'scroll' ? (
+                        <BookPageView loadMoreLines={loadMoreLines} canFetch={canFetch} isFetchingRef={isFetchingRef} loadingMore={loadingMore} hasMore={hasMore} goToLineRef={goToLineRef} />
+                      ) : (
+                        <Virtuoso
+                          id="book-lines"
+                          ref={virtuosoRef}
+                          scrollerRef={(el) => (scrollerRef.current = el as HTMLElement)}
+                          className="flex-1 leading-loose transition-transform duration-500 ease-in-out"
+                          data={lines}
+                          initialTopMostItemIndex={{ index: 0, align: 'center' }}
+                          increaseViewportBy={200}
+                          endReached={(index) => {
+                            if (!canFetch || isFetchingRef.current || isSearchJumpingRef.current) return;
+                            if (index < lines.length - 1) return;
+                            loadMoreLines(lines.length);
+                          }}
+                          atBottomStateChange={(atBottom) => {
+                            if (!canFetch || isFetchingRef.current || !atBottom) return;
+                            loadMoreLines(lines.length);
+                          }}
+                          // rangeChanged={onRangeChange}
+                          components={{
+                            List: forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ style, children, ...props }, ref) => (
+                              <div
+                                {...props}
+                                ref={ref}
+                                tabIndex={0}
+                                onWheel={userScroll}
+                                onTouchMove={userScroll}
+                                className="outline-none list-none text-left mx-auto w-11/12 md:w-8/12"
+                                style={{ ...style, fontSize, lineHeight, textAlign: alignment, paddingLeft: indent + 'ch', paddingRight: indent + 'ch' }}
+                              >
+                                {children}
+                              </div>
+                            )),
+                            Footer: () => (
+                              <div className="h-20 w-full flex justify-center items-center text-sm text-gray-300">
+                                {loadingMore ? (
+                                  <span className="flex justify-center items-center">
+                                    <Loader2 className="animate-spin mr-2" size={16} />
+                                    &nbsp;Loading more...
+                                  </span>
+                                ) : !hasMore ? (
+                                  <span>You've reach the end</span>
+                                ) : null}
+                              </div>
+                            ),
+                          }}
+                          // Individual Line Item
+                          itemContent={(index, line) => <BookLine index={index} line={line} />}
+                        />
+                      )}
+                      {/* End of Reading Area */}
                     </div>
 
                     <BookControl setOpenPanelLeft={setOpenPanelLeft} />

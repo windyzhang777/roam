@@ -180,6 +180,7 @@ interface ISettingContext extends Omit<BookSetting, 'bookId' | 'audioPath' | 'pi
   setParagraphSpacing: Dispatch<SetStateAction<BookSetting['paragraphSpacing']>>;
   setIndent: Dispatch<SetStateAction<BookSetting['indent']>>;
   setAlignment: Dispatch<SetStateAction<BookSetting['alignment']>>;
+  setPageView: Dispatch<SetStateAction<BookSetting['pageView']>>;
   availableVoices: VoiceOption[];
 }
 const defaultSettingContext: ISettingContext = {
@@ -197,6 +198,8 @@ const defaultSettingContext: ISettingContext = {
   setIndent: () => {},
   alignment: 'left',
   setAlignment: () => {},
+  pageView: 'scroll',
+  setPageView: () => {},
   availableVoices: [],
 };
 export const SettingContext = createContext<ISettingContext>(defaultSettingContext);
@@ -221,6 +224,8 @@ export const useSettingContext = () => {
     setIndent: settingContext.setIndent,
     alignment: settingContext.alignment,
     setAlignment: settingContext.setAlignment,
+    pageView: settingContext.pageView,
+    setPageView: settingContext.setPageView,
     availableVoices: settingContext.availableVoices,
   };
 };

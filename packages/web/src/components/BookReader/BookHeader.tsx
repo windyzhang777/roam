@@ -26,7 +26,7 @@ export const BookHeader = ({ searching, setOpenPanelLeft, setOpenPanelRight }: B
   if (!book || currentLine === undefined) return null;
 
   return (
-    <header className="z-10">
+    <header className="z-50">
       <nav id="controls" className="relative px-4 pt-0 pb-10 md:py-4">
         {/* Left Panel Group */}
         <div id="panel-left" title="Bookmars & Chapters" className="flex items-center gap-2">

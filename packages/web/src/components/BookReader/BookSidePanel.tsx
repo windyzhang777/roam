@@ -38,6 +38,7 @@ import {
   Bookmark,
   BookmarkX,
   CaseSensitive,
+  Columns2,
   Eraser,
   Highlighter,
   ListChevronsDownUp,
@@ -48,9 +49,11 @@ import {
   Minus,
   Moon,
   Plus,
+  RectangleVertical,
   Rows2,
   Rows4,
   Save,
+  Scroll,
   SquareArrowDown,
   SquareArrowUp,
   Sun,
@@ -433,7 +436,7 @@ export const SidePanelRight = ({ open, onClose }: BookSidePanelProps) => {
   const { lines } = useContentContext();
   const { readingMode } = useCommonContext();
   const { viewLine } = useViewLineContext();
-  const { fontSize, setFontSize, lineHeight, setLineHeight, paragraphSpacing, setParagraphSpacing, indent, setIndent, alignment, setAlignment } = useSettingContext();
+  const { fontSize, setFontSize, lineHeight, setLineHeight, paragraphSpacing, setParagraphSpacing, indent, setIndent, alignment, setAlignment, pageView, setPageView } = useSettingContext();
   const { searchText, searchRes, currentMatch, clickMatch, prevMatch, nextMatch, closeSearch } = useSearchContext();
 
   const renderHighlightedText = (text: string, highlight: string) => {
@@ -577,19 +580,6 @@ export const SidePanelRight = ({ open, onClose }: BookSidePanelProps) => {
               <div className="p-2 bg-highlight">Switch between different modes to enhance your reading experience</div>
             </div>
 
-            {/* Page View */}
-            {/* <div className="flex flex-col gap-2">
-            <div className="uppercase text-xs">page view</div>
-            <ButtonGroup className="flex-wrap w-full gap-2">
-              <Button size="icon" variant="outline" onClick={() => setFontSize((prev) => pPrev - 1)} className="grow border! border-sidebar-accent!">
-                <RectangleVertical strokeWidth={1.5} className="w-5! h-5!" />
-              </Button>
-              <Button size="icon" variant="outline" onClick={() => setFontSize((prev) => Pprev + 1)} className="grow border! border-sidebar-accent!">
-                <Columns2 strokeWidth={1.5} className="w-5! h-5!" />
-              </Button>
-            </ButtonGroup>
-          </div> */}
-
             {/* Font Size */}
             <div className="flex flex-col gap-2">
               <div className="uppercase text-xs">font size</div>
@@ -713,6 +703,27 @@ export const SidePanelRight = ({ open, onClose }: BookSidePanelProps) => {
                 </Button>
               </ButtonGroup>
               <Slider value={[indent ?? INDENT_DEFAULT]} onValueChange={async (indices: number[]) => setIndent(indices[0])} min={MIN_INDENT} max={MAX_INDENT} step={INDENT_STEP} className="mt-2" />
+            </div>
+
+            {/* Page View */}
+            <div className="flex flex-col gap-2">
+              <div className="uppercase text-xs">page view</div>
+              <ButtonGroup className="flex-wrap w-full">
+                <Button size="icon" variant={pageView === 'scroll' ? 'default' : 'outline'} onClick={() => setPageView('scroll')} className="grow border! border-sidebar-accent! rounded-r-none!">
+                  <Scroll strokeWidth={1.5} className="w-5! h-5!" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant={pageView === 'single' ? 'default' : 'outline'}
+                  onClick={() => setPageView('single')}
+                  className="grow border! border-l-0! border-r-0! border-sidebar-accent! rounded-none!"
+                >
+                  <RectangleVertical strokeWidth={1.5} className="w-5! h-5!" />
+                </Button>
+                <Button size="icon" variant={pageView === 'double' ? 'default' : 'outline'} onClick={() => setPageView('double')} className="grow border! border-sidebar-accent! rounded-l-none!">
+                  <Columns2 strokeWidth={1.5} className="w-5! h-5!" />
+                </Button>
+              </ButtonGroup>
             </div>
 
             {/* Alignment */}

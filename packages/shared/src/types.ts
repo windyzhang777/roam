@@ -79,6 +79,7 @@ export interface SearchMatch {
 export type VoiceType = 'system' | 'cloud';
 export type Alignment = 'left' | 'center' | 'right';
 export type Theme = 'light' | 'dark';
+export type PageView = 'scroll' | 'single' | 'double';
 
 export interface SpeechOptions {
   rate?: number;
@@ -93,6 +94,7 @@ export interface TextOptions {
   paragraphSpacing?: number;
   indent?: number;
   alignment?: Alignment;
+  pageView?: PageView;
 }
 
 export interface BookSetting extends SpeechOptions, TextOptions {

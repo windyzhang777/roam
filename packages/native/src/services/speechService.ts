@@ -29,9 +29,9 @@ export class SpeechService {
     this.silentAudio.volume = 0.001;
     this.cloudAudio.onerror = () => this.onIsPlayingChange?.(false);
 
-    window.addEventListener('beforeunload', () => {
-      this.stop();
-    });
+    // window.addEventListener('beforeunload', () => {
+    //   this.stop();
+    // });
   }
 
   static getInstance() {

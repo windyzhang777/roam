@@ -28,7 +28,7 @@ export const SidePanel = ({ open, onClose, children, direction = 'right', ...pro
       id={`side-panel-${direction}`}
       className={cn(
         props.className,
-        'fixed z-0 top-18 bottom-0 w-80 bg-background border-muted py-4 flex h-auto flex-col text-sm text-popover-foreground text-left',
+        'fixed z-20 top-18 bottom-0 w-80 bg-background border-muted py-4 flex h-auto flex-col text-sm text-popover-foreground text-left',
         'transition-transform duration-300 ease-in-out',
         'w-[clamp(40px,40%,180px)] md:w-[clamp(130px,16%,300px)] sm:max-w-sm',
         direction === 'right' ? 'right-0 border-l rounded-l-xs' : 'left-0 border-r rounded-r-xs',

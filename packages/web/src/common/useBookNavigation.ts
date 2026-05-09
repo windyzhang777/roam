@@ -1,5 +1,5 @@
 import { focusBody } from '@/utils';
-import { PAGE_SIZE, type Book } from '@audiobook/shared';
+import { PAGE_SIZE, type Book, type PageView } from '@audiobook/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { type LocationOptions, type VirtuosoHandle } from 'react-virtuoso';
 import { useAnimationFrame } from './useAnimationFrame';
@@ -7,7 +7,12 @@ import useTimer from './useTimer';
 
 export type ScrollMode = 'user' | 'search' | 'tts';
 
-export default function useBookNavigation(currentLine: number, lines: string[], loadMoreLines: (offset?: number, limit?: number) => Promise<void>) {
+interface useBookNavigationOptions {
+  pageView: NonNullable<PageView | undefined> | undefined;
+  goToLineRef: React.RefObject<((lineIndex: number) => void | null) | null>;
+}
+
+export default function useBookNavigation(currentLine: number, lines: string[], loadMoreLines: (offset?: number, limit?: number) => Promise<void>, options: useBookNavigationOptions) {
   const [viewLine, setViewLine] = useState<Book['currentLine']>(0);
   const [isCurrentLineVisible, setIsCurrentLineVisible] = useState(false);
 
@@ -44,10 +49,17 @@ export default function useBookNavigation(currentLine: number, lines: string[], 
     startTimer(() => (isSearchJumpingRef.current = false), 300);
   }, [startTimer]);
 
-  const scrollToLine = useCallback((index: number, behavior: LocationOptions['behavior'] = 'auto') => {
-    console.log(`scrollToLine :`, behavior);
-    virtuosoRef.current?.scrollToIndex({ index, align: 'start', behavior, offset: -20 });
-  }, []);
+  const scrollToLine = useCallback(
+    (index: number, behavior: LocationOptions['behavior'] = 'auto') => {
+      console.log(`scrollToLine :`, behavior);
+      if (options?.pageView && options.pageView !== 'scroll' && options?.goToLineRef?.current) {
+        options.goToLineRef.current(index);
+        return;
+      }
+      virtuosoRef.current?.scrollToIndex({ index, align: 'start', behavior, offset: -20 });
+    },
+    [options.goToLineRef, options.pageView],
+  );
 
   const jumpToRead = (index: number) => {
     scrollToLine(index);

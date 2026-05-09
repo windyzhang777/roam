@@ -1,10 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { useBookContext, useCommonContext, useSettingContext } from '@/config/contexts';
 import { cn } from '@/lib/utils';
+import { paginationStore } from '@/stores/paginationStore';
 import { getChapter } from '@/utils';
 import { calculateProgress } from '@audiobook/shared';
 import { Pause, Play, RotateCcw, RotateCw } from 'lucide-react';
-import { type SetStateAction } from 'react';
+import { useSyncExternalStore, type SetStateAction } from 'react';
 import { RateContextMenu, VoiceContextMenu } from './BookControlContextMenu';
 
 interface BookControlProps {
@@ -14,7 +15,8 @@ interface BookControlProps {
 export const BookControl = ({ setOpenPanelLeft }: BookControlProps) => {
   const { book, currentLine, totalLines, chapters } = useBookContext();
   const { isPlaying, handlePlayPause, prevLine, nextLine } = useCommonContext();
-  const { rate, selectedVoice } = useSettingContext();
+  const { rate, selectedVoice, pageView } = useSettingContext();
+  const { currentPage, totalPages } = useSyncExternalStore(paginationStore.subscribe, paginationStore.getSnapshot);
 
   const percentage = calculateProgress(currentLine || 0, totalLines);
   const currentChapter = currentLine ? getChapter(currentLine, chapters) : undefined;
@@ -33,10 +35,8 @@ export const BookControl = ({ setOpenPanelLeft }: BookControlProps) => {
         <div className={cn('bg-gray-200 h-1 rounded-tr-md float-right transition-all duration-300')} style={{ width: `${100 - percentage}%` }} />
       </div>
 
-      <div className="px-4 text-black/50 text-xs flex justify-between items-center [&>span]:w-20">
-        <span className="flex justify-start whitespace-nowrap">
-          {currentLine} / {totalLines}
-        </span>
+      <div className="px-4 text-muted-foreground/50 text-xs flex justify-between items-center [&>span]:w-20">
+        <span className="flex justify-start whitespace-nowrap">{pageView === 'scroll' ? `${currentLine} / ${totalLines}` : `${currentPage + 1} / ${totalPages}`}</span>
         <Button variant="ghost" onClick={() => setOpenPanelLeft((prev) => !prev)} title="Open Table of Contents" className="text-xs max-w-48">
           <span className="truncate">{currentChapter?.title || 'Table of Contents'}</span>
         </Button>

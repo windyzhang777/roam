@@ -56,6 +56,7 @@ const BookSettingSchema = new Schema<IBookSetting>(
     paragraphSpacing: Number,
     indent: Number,
     alignment: String,
+    pageView: String,
     audioPath: String,
   },
   { _id: false, toJSON: { virtuals: true }, toObject: { virtuals: true } },
