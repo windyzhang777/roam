@@ -1,4 +1,5 @@
 import { api } from '@/services/api';
+import { speechService } from '@/services/speechService';
 import {
   ALIGNMENT_DEFAULT,
   FONT_SIZE_DEFAULT,
@@ -33,15 +34,14 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
   const [alignment, setAlignment] = useState<NonNullable<BookSetting['alignment']>>();
   const [pageView, setPageView] = useState<NonNullable<BookSetting['pageView']>>();
   const [voice, setVoice] = useState<VoiceOption['id']>(VOICE_FALLBACK.id);
+  const [nativeVoices, setNativeVoices] = useState<VoiceOption[]>([]);
 
   const availableVoices = useMemo(() => {
     if (!lang) return [VOICE_FALLBACK];
-    // const nativeVoices = speechService.getNativeVoices(lang);
-    // const nativeOptions: VoiceOption[] = nativeVoices.map((voice) => ({ type: 'system', id: voice.name, displayName: voice.name, enabled: true }));
-    // const cloudOptions: VoiceOption[] = [{ type: 'cloud', id: 'google-neural2', displayName: 'Google AI (Neural2)', enabled: false }];
-    // return [...(nativeOptions.length > 0 ? nativeOptions : [VOICE_FALLBACK]), ...cloudOptions];
-    return [];
-  }, [lang]);
+    const nativeOptions = nativeVoices.length > 0 ? nativeVoices : [];
+    const cloudOptions: VoiceOption[] = [{ type: 'cloud', id: 'google-neural2', displayName: 'Google AI (Neural2)', enabled: false }];
+    return [...(nativeOptions.length > 0 ? nativeOptions : [VOICE_FALLBACK]), ...cloudOptions];
+  }, [lang, nativeVoices]);
 
   const selectedVoice = useMemo(() => {
     if (!voice) return VOICE_FALLBACK;
@@ -95,7 +95,7 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
         setParagraphSpacing(() => setting.paragraphSpacing || PARAGRAPH_SPACING_DEFAULT);
         setIndent(() => setting.indent || INDENT_DEFAULT);
         setAlignment(() => setting.alignment || ALIGNMENT_DEFAULT);
-        setPageView(() => setting.pageView || 'single');
+        setPageView(() => 'single');
       } catch (error) {
         console.error('❌ Failed to load setting: ', error);
       } finally {
@@ -105,6 +105,21 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
 
     loadBookSetting();
   }, [_id]);
+
+  useEffect(() => {
+    if (!lang) return;
+    let cancelled = false;
+
+    speechService.getNativeVoices(lang).then((voices) => {
+      if (cancelled) return;
+      const options: VoiceOption[] = voices.map((voice) => ({ type: 'system', id: voice.id, displayName: voice.name, enabled: true }));
+      setNativeVoices(options);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return {
     loading,

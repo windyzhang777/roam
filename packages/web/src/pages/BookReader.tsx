@@ -328,7 +328,6 @@ export const BookReader = () => {
                       <BookHeader searching={searching} setOpenPanelLeft={setOpenPanelLeft} setOpenPanelRight={setOpenPanelRight} />
 
                       {/* Start of Reading Area */}
-
                       {pageView === 'scroll' ? (
                         <BookScrollView
                           loadMoreLines={() => loadMoreLines(lines.length)}

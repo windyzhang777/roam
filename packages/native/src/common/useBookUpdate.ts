@@ -27,7 +27,7 @@ export function useBookUpdate<T>(_id: string | undefined, updates: T, canUpdate:
       // document.removeEventListener('visibilitychange', handlePageExit);
       // window.removeEventListener('beforeunload', handlePageExit);
       // window.removeEventListener('pagehide', handlePageExit);
-      flushUpdate();
+      // flushUpdate();
     };
   }, [flushUpdate]);
 

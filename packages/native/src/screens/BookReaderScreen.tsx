@@ -9,8 +9,8 @@ import { useThemeContext } from '@/components/theme-provider';
 import { BookContext, CommonContext, ContentContext, SettingContext, SpeechContext } from '@/config/contexts';
 import { getChapterIndex } from '@/utils';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { ArrowLeft, Loader } from 'lucide-react-native';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, CirclePause, CirclePlay, Loader, SkipBack, SkipForward } from 'lucide-react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -160,34 +160,32 @@ export const BookReaderScreen = () => {
   }, [closeSearch, ttsScroll]);
 
   const navigateBack = useCallback(() => {
-    flushUpdate();
+    // flushUpdate();
     navigation.goBack();
-  }, [flushUpdate, navigation]);
+  }, [navigation]);
 
   const handlePlayPause = useCallback(() => {
-    //   if (isPlaying) {
-    //     pause();
-    //   } else {
-    //     let startFrom = shouldReadViewLineRef.current ? viewLineRef.current : currentLineRef.current;
-    //     startFrom = startFrom >= totalLines ? 0 : startFrom; // if at the end, reset to start from the first line
-    //     startFromLine(startFrom);
-    //     ttsFocus();
-    //     // startAnimationFrame(() => scrollToLine(startFrom));
-    //     play(startFrom);
-    //     shouldReadViewLineRef.current = false;
-    //   }
-    //   // focusBody();
-    // }, [currentLineRef, viewLineRef, startFromLine, ttsFocus, isPlaying, scrollToLine, totalLines, shouldReadViewLineRef, play, pause]);
-  }, []);
+    if (isPlaying) {
+      pause();
+    } else {
+      let startFrom = shouldReadViewLineRef.current ? viewLineRef.current : currentLineRef.current;
+      startFrom = startFrom >= totalLines ? 0 : startFrom; // if at the end, reset to start from the first line
+      startFromLine(startFrom);
+      ttsFocus();
+      // startAnimationFrame(() => scrollToLine(startFrom));
+      play(startFrom);
+      shouldReadViewLineRef.current = false;
+    }
+  }, [currentLineRef, viewLineRef, startFromLine, ttsFocus, isPlaying, scrollToLine, totalLines, shouldReadViewLineRef, play, pause]);
 
   const handleLineClick = (index: number) => {
     startFromLine(index);
     ttsFocus();
-    // if (isPlaying) {
-    //   resume(index);
-    // } else {
-    //   play(index);
-    // }
+    if (isPlaying) {
+      resume(index);
+    } else {
+      play(index);
+    }
   };
 
   const moveToLine = useCallback(
@@ -195,9 +193,9 @@ export const BookReaderScreen = () => {
       if (index == currentLineRef.current) return;
       startFromLine(index);
       ttsFocus();
-      // if (isPlaying) stop();
+      if (isPlaying) stop();
     },
-    [currentLineRef, startFromLine, ttsFocus],
+    [currentLineRef, isPlaying, startFromLine, ttsFocus],
   );
 
   const prevLine = useCallback(() => {
@@ -211,38 +209,7 @@ export const BookReaderScreen = () => {
   }, [currentLineRef, totalLines, moveToLine]);
 
   // cleanup on unmount
-  // useEffect(() => () => stop(), [_id, stop]);
-
-  // useEffect(() => {
-  //   const handleGlobalKeyDown = (e: KeyboardEvent) => {
-  //     // const activeElement = document.activeElement;
-  //     // console.log(`activeElement :`, activeElement);
-
-  //     if (e.key === 'Escape') {
-  //       e.preventDefault();
-  //       closeSearch();
-  //       return;
-  //     }
-
-  //     if (e.key === ' ') {
-  //       e.preventDefault();
-  //       // handlePlayPause();
-  //     }
-
-  //     if (e.key === 'ArrowDown') {
-  //       e.preventDefault();
-  //       nextLine();
-  //     }
-
-  //     if (e.key === 'ArrowUp') {
-  //       e.preventDefault();
-  //       prevLine();
-  //     }
-  //   };
-
-  //   // window.addEventListener('keydown', handleGlobalKeyDown);
-  //   // return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  // }, [closeSearch, nextLine, prevLine]);
+  useEffect(() => () => stop(), [_id, stop]);
 
   if (loading) {
     return (
@@ -280,16 +247,21 @@ export const BookReaderScreen = () => {
       </View>
 
       {/* Play controls */}
-      {/* <View style={styles.playControls}>
-          <TouchableOpacity style={[styles.playButton, false && styles.playButtonActive]} onPress={handlePlayPause}>
-            {false ? <Pause size={24} color="#fff" /> : <Play size={24} color="#fff" />}
-          </TouchableOpacity>
-        </View>
-      </View> */}
+      <View style={[styles.playControls, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
+        <TouchableOpacity style={styles.controlButton} onPress={prevLine}>
+          <SkipBack size={20} color={colors.foreground} />
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.playButton, { borderColor: colors.primary }]} onPress={handlePlayPause}>
+          {isPlaying ? <CirclePause size={22} color={colors.foreground} /> : <CirclePlay size={22} color={colors.foreground} />}
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.controlButton} onPress={nextLine}>
+          <SkipForward size={20} color={colors.foreground} />
+        </TouchableOpacity>
+      </View>
 
       <CommonContext.Provider
         value={{
-          isPlaying: false,
+          isPlaying,
           handlePlayPause,
           readingMode,
           jumpToIndex,
@@ -386,7 +358,7 @@ const styles = StyleSheet.create({
   backButton: { padding: 4 },
   headerTitle: { flex: 1, fontSize: 16, fontWeight: '600' },
   lineIndicator: { fontSize: 13 },
-  playControls: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  playButton: { width: 60, height: 60, justifyContent: 'center', alignItems: 'center', borderRadius: 30 },
-  playButtonActive: {},
+  playControls: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 8, borderTopWidth: 1, gap: 24 },
+  controlButton: { padding: 10 },
+  playButton: { width: 48, height: 48, justifyContent: 'center', alignItems: 'center', borderRadius: 24 },
 });

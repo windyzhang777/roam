@@ -41,7 +41,9 @@ export default function useBookSpeech(
     [speechConfigs],
   );
 
-  const stop = useCallback(() => speechService.stop(), []);
+  const stop = useCallback(() => {
+    speechService.stop();
+  }, []);
 
   // setup speech service callbacks
   useEffect(() => {
