@@ -23,11 +23,15 @@ export function useBookUpdate<T>(_id: string | undefined, updates: T, canUpdate:
     document.addEventListener('visibilitychange', handlePageExit);
     window.addEventListener('beforeunload', handlePageExit);
     window.addEventListener('pagehide', handlePageExit);
+    window.addEventListener('blur', handlePageExit);
+    window.addEventListener('focus', handlePageExit);
 
     return () => {
       document.removeEventListener('visibilitychange', handlePageExit);
       window.removeEventListener('beforeunload', handlePageExit);
       window.removeEventListener('pagehide', handlePageExit);
+      window.removeEventListener('blur', handlePageExit);
+      window.removeEventListener('focus', handlePageExit);
       flushUpdate();
     };
   }, [flushUpdate]);

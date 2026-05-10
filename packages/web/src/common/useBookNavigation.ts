@@ -12,7 +12,13 @@ interface useBookNavigationOptions {
   goToLineRef: React.RefObject<((lineIndex: number) => void | null) | null>;
 }
 
-export default function useBookNavigation(currentLine: number, lines: string[], loadMoreLines: (offset?: number, limit?: number) => Promise<void>, options: useBookNavigationOptions) {
+export default function useBookNavigation(
+  loading: boolean,
+  currentLine: number,
+  lines: string[],
+  loadMoreLines: (offset?: number, limit?: number) => Promise<void>,
+  options: useBookNavigationOptions,
+) {
   const [viewLine, setViewLine] = useState<Book['currentLine']>(0);
   const [isCurrentLineVisible, setIsCurrentLineVisible] = useState(false);
 
@@ -74,7 +80,7 @@ export default function useBookNavigation(currentLine: number, lines: string[], 
       console.log(`scrollToLine :`, index, behavior);
       startTimer(() => virtuosoRef.current?.scrollToIndex({ index, align: 'start', behavior, offset: -20 }), 100);
     },
-    [options.goToLineRef, options.pageView, startTimer, checkLineVisibility],
+    [startTimer, checkLineVisibility],
   );
 
   const jumpToRead = (index: number) => {
@@ -102,15 +108,17 @@ export default function useBookNavigation(currentLine: number, lines: string[], 
 
   const updateIsCurrentLineVisible = useCallback(() => {
     const isVisible = checkLineVisibility(currentLine);
-    isCurrentLineVisibleRef.current = isVisible || false;
-    if (isCurrentLineVisibleRef.current !== isCurrentLineVisible) {
-      setIsCurrentLineVisible(isCurrentLineVisibleRef.current);
+    const next = isVisible || false;
+    if (next !== isCurrentLineVisibleRef.current) {
+      isCurrentLineVisibleRef.current = next;
+      setIsCurrentLineVisible(next);
     }
     return isVisible;
-  }, [checkLineVisibility, currentLine, isCurrentLineVisible]);
+  }, [checkLineVisibility, currentLine]);
 
   // tts autoscroll
   useEffect(() => {
+    if (loading) return;
     const isVisible = updateIsCurrentLineVisible();
     if (isUserScrollRef.current || isVisible) return;
     scrollToLine(currentLine, 'smooth');
@@ -119,7 +127,7 @@ export default function useBookNavigation(currentLine: number, lines: string[], 
     if (!isSearchJumpingRef.current) {
       updateViewLine(viewLineRef.current);
     }
-  }, [updateIsCurrentLineVisible, currentLine, scrollToLine, updateViewLine]);
+  }, [loading, updateIsCurrentLineVisible, currentLine, scrollToLine, updateViewLine]);
 
   // update line visibility on lines change
   useEffect(() => {

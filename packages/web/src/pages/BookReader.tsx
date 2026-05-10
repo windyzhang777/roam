@@ -6,20 +6,19 @@ import { useReaderSettings } from '@/common/useBookSettings';
 import useBookSpeech from '@/common/useBookSpeech';
 import { BookControl } from '@/components/BookReader/BookControl';
 import { BookHeader } from '@/components/BookReader/BookHeader';
-import { BookLine } from '@/components/BookReader/BookLine';
 import { SidePanelLeft, SidePanelRight } from '@/components/BookReader/BookSidePanel';
 import { Button } from '@/components/ui/button';
 import { TextContextMenu } from '@/components/ui/ContextMenu';
 import { BookContext, CommonContext, ContentContext, SearchContext, SettingContext, SpeechContext, ViewLineContext } from '@/config/contexts';
 import { cn } from '@/lib/utils';
+import { BookPageView } from '@/pages/BookPageView';
+import { BookScrollView } from '@/pages/BookScrollView';
 import { wordHighlightStore } from '@/stores/wordHighlightStore';
 import { focusBody, getChapterIndex } from '@/utils';
 import { bookTitleWithAuthor, type BookMark } from '@audiobook/shared';
-import { ChevronRight, Loader, Loader2 } from 'lucide-react';
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { ChevronRight, Loader } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Virtuoso } from 'react-virtuoso';
-import { BookPageView } from './BookPageView';
 
 export type ReadingMode = 'tts' | 'search' | 'edit';
 
@@ -88,6 +87,7 @@ export const BookReader = () => {
   } = useReaderSettings(_id, lang);
 
   const goToLineRef = useRef<(lineIndex: number) => void | null>(null);
+  const loading = useMemo(() => !_id || loadingBook || loadingSetting, [_id, loadingBook, loadingSetting]);
 
   // navigation hook
   const {
@@ -104,7 +104,7 @@ export const BookReader = () => {
     scrollToLine,
     jumpToRead,
     jumpToIndex,
-  } = useBookNavigation(currentLine, lines, loadMoreLines, { pageView, goToLineRef });
+  } = useBookNavigation(loading && lines.length === 0, currentLine, lines, loadMoreLines, { pageView, goToLineRef });
 
   const startFromLine = useCallback(
     (index: number) => {
@@ -148,8 +148,6 @@ export const BookReader = () => {
     if (!chapter) return undefined;
     return { chapterIndex, ...chapter };
   }, [viewLine, chapters]);
-
-  const loading = useMemo(() => !_id || loadingBook || loadingSetting, [_id, loadingBook, loadingSetting]);
 
   const flushUpdate = () => {
     flushBook();
@@ -331,56 +329,25 @@ export const BookReader = () => {
 
                       {/* Start of Reading Area */}
 
-                      {pageView !== 'scroll' ? (
-                        <BookPageView loadMoreLines={loadMoreLines} canFetch={canFetch} isFetchingRef={isFetchingRef} loadingMore={loadingMore} hasMore={hasMore} goToLineRef={goToLineRef} />
+                      {pageView === 'scroll' ? (
+                        <BookScrollView
+                          loadMoreLines={() => loadMoreLines(lines.length)}
+                          canFetch={canFetch}
+                          isFetchingRef={isFetchingRef}
+                          loadingMore={loadingMore}
+                          hasMore={hasMore}
+                          virtuosoRef={virtuosoRef}
+                          scrollerRef={scrollerRef}
+                          isSearchJumpingRef={isSearchJumpingRef}
+                        />
                       ) : (
-                        <Virtuoso
-                          id="book-lines"
-                          ref={virtuosoRef}
-                          scrollerRef={(el) => (scrollerRef.current = el as HTMLElement)}
-                          className="flex-1 leading-loose transition-transform duration-500 ease-in-out"
-                          data={lines}
-                          initialTopMostItemIndex={{ index: 0, align: 'center' }}
-                          increaseViewportBy={200}
-                          endReached={(index) => {
-                            if (!canFetch || isFetchingRef.current || isSearchJumpingRef.current) return;
-                            if (index < lines.length - 1) return;
-                            loadMoreLines(lines.length);
-                          }}
-                          atBottomStateChange={(atBottom) => {
-                            if (!canFetch || isFetchingRef.current || !atBottom) return;
-                            loadMoreLines(lines.length);
-                          }}
-                          // rangeChanged={onRangeChange}
-                          components={{
-                            List: forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ style, children, ...props }, ref) => (
-                              <div
-                                {...props}
-                                ref={ref}
-                                tabIndex={0}
-                                onWheel={userScroll}
-                                onTouchMove={userScroll}
-                                className="outline-none list-none text-left mx-auto w-11/12 md:w-8/12"
-                                style={{ ...style, fontSize, lineHeight, textAlign: alignment, paddingLeft: indent + 'ch', paddingRight: indent + 'ch' }}
-                              >
-                                {children}
-                              </div>
-                            )),
-                            Footer: () => (
-                              <div className="h-20 w-full flex justify-center items-center text-sm text-gray-300">
-                                {loadingMore ? (
-                                  <span className="flex justify-center items-center">
-                                    <Loader2 className="animate-spin mr-2" size={16} />
-                                    &nbsp;Loading more...
-                                  </span>
-                                ) : !hasMore ? (
-                                  <span>You've reach the end</span>
-                                ) : null}
-                              </div>
-                            ),
-                          }}
-                          // Individual Line Item
-                          itemContent={(index, line) => <BookLine index={index} line={line} />}
+                        <BookPageView
+                          loadMoreLines={() => loadMoreLines(lines.length)}
+                          canFetch={canFetch}
+                          isFetchingRef={isFetchingRef}
+                          loadingMore={loadingMore}
+                          hasMore={hasMore}
+                          goToLineRef={goToLineRef}
                         />
                       )}
                       {/* End of Reading Area */}

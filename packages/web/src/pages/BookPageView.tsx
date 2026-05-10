@@ -7,7 +7,7 @@ import { Loader2 } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface BookPageViewProps {
-  loadMoreLines: (offset?: number, limit?: number) => Promise<void>;
+  loadMoreLines: () => Promise<void>;
   canFetch: boolean;
   isFetchingRef: React.RefObject<boolean>;
   loadingMore: boolean;
@@ -71,8 +71,8 @@ export const BookPageView = ({ loadMoreLines, canFetch, isFetchingRef, loadingMo
   useEffect(() => {
     if (totalPages === 0) return;
 
-    const targetPage = getPageForLine(currentLine);
-    goToPage(targetPage);
+    const effectivePage = getPageForLine(currentLine);
+    goToPage(effectivePage);
   }, [currentLine, getPageForLine, goToPage, totalPages]);
 
   // Load more when near the end
@@ -81,10 +81,11 @@ export const BookPageView = ({ loadMoreLines, canFetch, isFetchingRef, loadingMo
     if (totalPages === 0) return;
 
     // Prefetch if within 2 pages of the end
-    if (currentPage >= totalPages - 2) {
-      loadMoreLines(lines.length);
+    const effectivePage = getPageForLine(currentLine);
+    if (effectivePage >= totalPages - 2) {
+      loadMoreLines();
     }
-  }, [canFetch, currentPage, hasMore, isFetchingRef, lines.length, loadMoreLines, totalPages]);
+  }, [canFetch, getPageForLine, currentLine, hasMore, isFetchingRef, pageView, loadMoreLines, totalPages]);
 
   // hijack the browser's keyboard nav
   useEffect(() => {

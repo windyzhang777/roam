@@ -74,14 +74,13 @@ interface SidePanelLeftProps extends BookSidePanelProps {
 }
 
 export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeftProps) => {
-  const { book, chapters, bookmarks, viewChapter, highlights } = useBookContext();
+  const { book, chapters, bookmarks, viewChapter, highlights, setBookmarks, setHighlights, setChapters } = useBookContext();
   const showChapters = useMemo(() => chapters?.length > 1, [chapters]);
   const [index, setIndex] = useState(showChapters ? 0 : 1);
   const [selectedBookmark, setSelectedBookmark] = useState<number>();
   const [selectedHighlight, setSelectedHighlight] = useState<number>();
-  const { listRef, isAtTop, isAtBottom, onScroll, scrollToView, scrollToTop, scrollToBottom } = useScroll();
 
-  const { setBookmarks, setHighlights, setChapters } = useBookContext();
+  const { listRef, isAtTop, isAtBottom, onScroll, scrollToView, scrollToTop, scrollToBottom } = useScroll();
   const { hydrateChapterByIndex, jumpToIndex } = useCommonContext();
   const { saveBookmarksToLocal, importBookmarksFromLocal, saveChaptersToLocal, importChaptersFromLocal, saveHighlightsToLocal, importHighlightsFromLocal } = useSaveToLocal();
 
