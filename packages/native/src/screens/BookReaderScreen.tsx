@@ -1,13 +1,17 @@
 import useBookNavigation from '@/common/useBookNavigation';
 import { useBookReader } from '@/common/useBookReader';
 import { useBookSearch } from '@/common/useBookSearch';
+import { useReaderSettings } from '@/common/useBookSettings';
+import useBookSpeech from '@/common/useBookSpeech';
+import { BookPageView } from '@/components/BookPageView';
+import { BookScrollView } from '@/components/BookScrollView';
 import { useThemeContext } from '@/components/theme-provider';
+import { BookContext, CommonContext, ContentContext, SettingContext, SpeechContext } from '@/config/contexts';
 import { getChapterIndex } from '@/utils';
-import { DELETE_MARKER, IMAGE_MARKER } from '@audiobook/shared';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { ArrowLeft, Loader, Pause, Play } from 'lucide-react-native';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, LayoutChangeEvent, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ArrowLeft, Loader } from 'lucide-react-native';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export type ReadingMode = 'tts' | 'search' | 'edit';
@@ -55,25 +59,30 @@ export const BookReaderScreen = () => {
     toaster,
   } = useBookReader(_id);
 
-  // const {
-  //   loading: loadingSetting,
-  //   fontSize,
-  //   setFontSize,
-  //   rate,
-  //   setRate,
-  //   setVoice,
-  //   selectedVoice,
-  //   lineHeight,
-  //   setLineHeight,
-  //   paragraphSpacing,
-  //   setParagraphSpacing,
-  //   indent,
-  //   setIndent,
-  //   alignment,
-  //   setAlignment,
-  //   flushSetting,
-  //   availableVoices,
-  // } = useReaderSettings(_id, lang);
+  const {
+    loading: loadingSetting,
+    fontSize,
+    setFontSize,
+    rate,
+    setRate,
+    setVoice,
+    selectedVoice,
+    lineHeight,
+    setLineHeight,
+    paragraphSpacing,
+    setParagraphSpacing,
+    indent,
+    setIndent,
+    alignment,
+    setAlignment,
+    pageView,
+    setPageView,
+    flushSetting,
+    availableVoices,
+  } = useReaderSettings(_id, lang);
+
+  const goToLineRef = useRef<(lineIndex: number) => void | null>(null);
+  const loading = useMemo(() => !_id || loadingBook || loadingSetting, [_id, loadingBook, loadingSetting]);
 
   // navigation hook
   const {
@@ -95,7 +104,7 @@ export const BookReaderScreen = () => {
     onLayout,
     onContentSizeChange,
     recordLineLayout,
-  } = useBookNavigation(currentLine, lines, loadMoreLines, canFetch, isFetchingRef);
+  } = useBookNavigation(loading && lines.length === 0, currentLine, lines, loadMoreLines, canFetch, isFetchingRef, { goToLineRef });
 
   const startFromLine = useCallback(
     (index: number) => {
@@ -106,7 +115,7 @@ export const BookReaderScreen = () => {
   );
 
   // speech hook
-  // const { isPlaying, play, pause, resume, stop } = useBookSpeech(_id, lines, lang, totalLines, selectedVoice, rate, currentLine, startFromLine, loadMoreLines, onBookCompleted);
+  const { isPlaying, play, pause, resume, stop } = useBookSpeech(_id, lines, lang, totalLines, selectedVoice, rate, currentLine, startFromLine, loadMoreLines, onBookCompleted);
 
   // search hook
   const {
@@ -140,12 +149,10 @@ export const BookReaderScreen = () => {
     return { chapterIndex, ...chapter };
   }, [viewLine, chapters]);
 
-  const loading = useMemo(() => !_id || loadingBook, [_id, loadingBook]);
-
-  // const flushUpdate = useCallback(() => {
-  //   flushBook();
-  //   flushSetting();
-  // }, [flushBook, flushSetting]);
+  const flushUpdate = useCallback(() => {
+    flushBook();
+    flushSetting();
+  }, [flushBook, flushSetting]);
 
   const ttsFocus = useCallback(() => {
     closeSearch();
@@ -153,9 +160,9 @@ export const BookReaderScreen = () => {
   }, [closeSearch, ttsScroll]);
 
   const navigateBack = useCallback(() => {
-    flushBook();
+    flushUpdate();
     navigation.goBack();
-  }, [flushBook, navigation]);
+  }, [flushUpdate, navigation]);
 
   const handlePlayPause = useCallback(() => {
     //   if (isPlaying) {
@@ -190,7 +197,7 @@ export const BookReaderScreen = () => {
       ttsFocus();
       // if (isPlaying) stop();
     },
-    [currentLineRef, startFromLine, ttsFocus, stop],
+    [currentLineRef, startFromLine, ttsFocus],
   );
 
   const prevLine = useCallback(() => {
@@ -204,38 +211,38 @@ export const BookReaderScreen = () => {
   }, [currentLineRef, totalLines, moveToLine]);
 
   // cleanup on unmount
-  useEffect(() => () => stop(), [_id, stop]);
+  // useEffect(() => () => stop(), [_id, stop]);
 
-  useEffect(() => {
-    const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      const activeElement = document.activeElement;
-      // console.log(`activeElement :`, activeElement);
+  // useEffect(() => {
+  //   const handleGlobalKeyDown = (e: KeyboardEvent) => {
+  //     // const activeElement = document.activeElement;
+  //     // console.log(`activeElement :`, activeElement);
 
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        closeSearch();
-        return;
-      }
+  //     if (e.key === 'Escape') {
+  //       e.preventDefault();
+  //       closeSearch();
+  //       return;
+  //     }
 
-      if (activeElement === document.body && e.key === ' ') {
-        e.preventDefault();
-        // handlePlayPause();
-      }
+  //     if (e.key === ' ') {
+  //       e.preventDefault();
+  //       // handlePlayPause();
+  //     }
 
-      if (activeElement === document.body && e.key === 'ArrowDown') {
-        e.preventDefault();
-        nextLine();
-      }
+  //     if (e.key === 'ArrowDown') {
+  //       e.preventDefault();
+  //       nextLine();
+  //     }
 
-      if (activeElement === document.body && e.key === 'ArrowUp') {
-        e.preventDefault();
-        prevLine();
-      }
-    };
+  //     if (e.key === 'ArrowUp') {
+  //       e.preventDefault();
+  //       prevLine();
+  //     }
+  //   };
 
-    window.addEventListener('keydown', handleGlobalKeyDown);
-    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [closeSearch, nextLine, prevLine]);
+  //   // window.addEventListener('keydown', handleGlobalKeyDown);
+  //   // return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  // }, [closeSearch, nextLine, prevLine]);
 
   if (loading) {
     return (
@@ -258,67 +265,114 @@ export const BookReaderScreen = () => {
   }
 
   return (
-    <SafeAreaView style={[styles.container, styles.center, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <View style={styles.textSizeControls}>
-          <TouchableOpacity style={styles.backButton} onPress={navigateBack}>
-            <ArrowLeft size={20} color={colors.foreground} />
-          </TouchableOpacity>
-          <Text numberOfLines={1} style={[styles.headerTitle, { color: colors.foreground }]}>
-            {book.title}
-          </Text>
-          <Text style={[styles.header, { color: colors.mutedForeground }]}>
-            {currentLine}/{book.totalLines}
-          </Text>
-        </View>
+        <TouchableOpacity style={styles.backButton} onPress={navigateBack}>
+          <ArrowLeft size={20} color={colors.foreground} />
+        </TouchableOpacity>
+        <Text numberOfLines={1} style={[styles.headerTitle, { color: colors.foreground }]}>
+          {book.title}
+        </Text>
+        <Text style={[styles.lineIndicator, { color: colors.mutedForeground }]}>
+          {currentLine}/{book.totalLines}
+        </Text>
+      </View>
 
-        {/* Play controls */}
-        <View style={styles.playControls}>
+      {/* Play controls */}
+      {/* <View style={styles.playControls}>
           <TouchableOpacity style={[styles.playButton, false && styles.playButtonActive]} onPress={handlePlayPause}>
             {false ? <Pause size={24} color="#fff" /> : <Play size={24} color="#fff" />}
           </TouchableOpacity>
         </View>
-      </View>
-      {/* Reading area */}
-      <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={styles.scrollContent}
-        scrollEventThrottle={100}
-        onScroll={onScroll}
-        onLayout={(e: LayoutChangeEvent) => onLayout(e.nativeEvent.layout.height)}
-        // bounces={false}
-        onContentSizeChange={onContentSizeChange}
+      </View> */}
+
+      <CommonContext.Provider
+        value={{
+          isPlaying: false,
+          handlePlayPause,
+          readingMode,
+          jumpToIndex,
+          jumpToRead: () => jumpToRead(currentLineRef.current),
+          ttsScroll,
+          userScroll,
+          navigateBack,
+          hydrateChapterByIndex,
+          handleLineClick,
+          prevLine,
+          nextLine,
+        }}
       >
-        {lines.map((line, index) => {
-          const isImage = line.startsWith(IMAGE_MARKER);
-          const isDeleted = line.startsWith(DELETE_MARKER);
-
-          if (isImage || isDeleted) return null;
-
-          return (
-            <View
-              key={index}
-              onLayout={(e: LayoutChangeEvent) => {
-                recordLineLayout(index, e.nativeEvent.layout.y, e.nativeEvent.layout.height);
+        <BookContext.Provider
+          value={{
+            _id,
+            currentLine,
+            totalLines,
+            lastCompleted,
+            chapters,
+            setChapters,
+            toggleChapter,
+            bookmarks,
+            setBookmarks,
+            toggleBookmark,
+            highlights,
+            setHighlights,
+            toggleHighlight,
+            viewChapter,
+            book,
+            deleteLine,
+            restoreLine,
+          }}
+        >
+          <ContentContext.Provider value={{ lines, lang, hasMore }}>
+            <SettingContext.Provider
+              value={{
+                fontSize,
+                setFontSize,
+                rate,
+                setRate,
+                setVoice,
+                selectedVoice,
+                lineHeight,
+                setLineHeight,
+                paragraphSpacing,
+                setParagraphSpacing,
+                indent,
+                setIndent,
+                alignment,
+                setAlignment,
+                pageView,
+                setPageView,
+                availableVoices,
               }}
-              collapsable={false}
             >
-              <TouchableOpacity activeOpacity={0.7} onPress={() => handleLineClick(index)}>
-                <Text
-                  style={[
-                    styles.bookText,
-                    // { fontSize: fontSize ?? 18, lineHeight: (fontSize ?? 18) * (lineHeight ?? 2), color: colors.foreground },
-                    index === currentLine && { backgroundColor: colors.highlight },
-                  ]}
-                >
-                  {line}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          );
-        })}
-      </ScrollView>
+              <SpeechContext.Provider value={{ isPlaying, play, pause, resume: () => resume(currentLineRef.current), stop }}>
+                {/* Start of Reading Area */}
+                {pageView === 'scroll' ? (
+                  <BookScrollView
+                    scrollViewRef={scrollViewRef}
+                    onScroll={onScroll}
+                    onLayout={onLayout}
+                    onContentSizeChange={onContentSizeChange}
+                    recordLineLayout={recordLineLayout}
+                    handleLineClick={handleLineClick}
+                  />
+                ) : (
+                  <BookPageView
+                    loadMoreLines={() => loadMoreLines(lines.length)}
+                    canFetch={canFetch}
+                    isFetchingRef={isFetchingRef}
+                    loadingMore={loadingMore}
+                    hasMore={hasMore}
+                    goToLineRef={goToLineRef}
+                    handleLineClick={handleLineClick}
+                  />
+                )}
+              </SpeechContext.Provider>
+            </SettingContext.Provider>
+          </ContentContext.Provider>
+        </BookContext.Provider>
+      </CommonContext.Provider>
       {/* <TouchableWithoutFeedback onPress={() => setShowControls(!showControls)}>
       </TouchableWithoutFeedback> */}
     </SafeAreaView>
@@ -331,19 +385,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: 1, gap: 8 },
   backButton: { padding: 4 },
   headerTitle: { flex: 1, fontSize: 16, fontWeight: '600' },
-  scrollContent: { paddingHorizontal: 20, paddingVertical: 24 },
-  bookText: { textAlign: 'left', marginBottom: 4, paddingVertical: 2, paddingHorizontal: 4, borderRadius: 4 },
-  loadingMore: { flexDirection: 'row', justifyContent: 'center', paddingVertical: 16, fontSize: 13 },
-  iconButton: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center', borderRadius: 20 },
-  textSizeLabel: { fontSize: 14, fontWeight: '600', minWidth: 30, textAlign: 'center' },
-
-  centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { marginTop: 12, fontSize: 16, color: '#666' },
-  errorText: { fontSize: 18 },
-  readingArea: { flex: 1 },
-  highlightedLine: { paddingHorizontal: 4, borderRadius: 8 },
-  controlBar: { borderTopWidth: 1, paddingVertical: 12, paddingHorizontal: 16 },
-  textSizeControls: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 12, gap: 16 },
+  lineIndicator: { fontSize: 13 },
   playControls: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   playButton: { width: 60, height: 60, justifyContent: 'center', alignItems: 'center', borderRadius: 30 },
   playButtonActive: {},

@@ -1,6 +1,4 @@
 import { type VoiceOption } from '@/common/useBookSettings';
-import { speechService } from '@/services/speechService';
-import { wordHighlightStore } from '@/stores/wordHighlightStore';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export default function useBookSpeech(
@@ -26,55 +24,57 @@ export default function useBookSpeech(
   const play = useCallback(
     (index: number = currentLine) => {
       if (!_id || !speechConfigs) return;
-      speechService.start(index, speechConfigs);
+      // speechService.start(index, speechConfigs);
     },
     [_id, currentLine, speechConfigs],
   );
 
-  const pause = useCallback(() => speechService.pause(), []);
+  const pause = useCallback(() => {
+    // speechService.pause();
+  }, []);
 
   const resume = useCallback(
     (index: number) => {
       if (!speechConfigs) return;
-      speechService.resume(index, speechConfigs);
+      // speechService.resume(index, speechConfigs);
     },
     [speechConfigs],
   );
 
-  const stop = useCallback(() => speechService.stop(), []);
+  // const stop = useCallback(() => speechService.stop(), []);
 
   // setup speech service callbacks
-  useEffect(() => {
-    speechService.onLineEnd = (index) => onLineEnd(index);
-    speechService.onIsPlayingChange = (playing) => setIsPlaying(playing);
-    speechService.onLoadMoreLines = (linesIndex) => {
-      shouldResumeRef.current = true;
-      loadMoreLines(linesIndex);
-    };
-    speechService.onBookCompleted = () => onBookCompleted();
-    speechService.onWordBoundary = (lineIndex, charIndex, charLength) => {
-      if (charIndex < 0) {
-        wordHighlightStore.setActiveWord(null);
-      } else {
-        wordHighlightStore.setActiveWord({ lineIndex, charIndex, charLength });
-      }
-    };
+  // useEffect(() => {
+  //   speechService.onLineEnd = (index) => onLineEnd(index);
+  //   speechService.onIsPlayingChange = (playing) => setIsPlaying(playing);
+  //   speechService.onLoadMoreLines = (linesIndex) => {
+  //     shouldResumeRef.current = true;
+  //     loadMoreLines(linesIndex);
+  //   };
+  //   speechService.onBookCompleted = () => onBookCompleted();
+  //   speechService.onWordBoundary = (lineIndex, charIndex, charLength) => {
+  //     if (charIndex < 0) {
+  //       wordHighlightStore.setActiveWord(null);
+  //     } else {
+  //       wordHighlightStore.setActiveWord({ lineIndex, charIndex, charLength });
+  //     }
+  //   };
 
-    return () => {
-      speechService.onLineEnd = null;
-      speechService.onIsPlayingChange = null;
-      speechService.onLoadMoreLines = null;
-      speechService.onBookCompleted = null;
-      speechService.onWordBoundary = null;
-    };
-  }, [onLineEnd, loadMoreLines, onBookCompleted]);
+  //   return () => {
+  //     speechService.onLineEnd = null;
+  //     speechService.onIsPlayingChange = null;
+  //     speechService.onLoadMoreLines = null;
+  //     speechService.onBookCompleted = null;
+  //     speechService.onWordBoundary = null;
+  //   };
+  // }, [onLineEnd, loadMoreLines, onBookCompleted]);
 
   // auto-resume after loading more lines
   useEffect(() => {
     if (!speechConfigs || !isPlaying || !lines[currentLine] || !shouldResumeRef.current) return;
 
     shouldResumeRef.current = false;
-    speechService.resume(currentLine, speechConfigs);
+    // speechService.resume(currentLine, speechConfigs);
   }, [isPlaying, lines, currentLine, speechConfigs]);
 
   return { isPlaying, play, pause, resume, stop };

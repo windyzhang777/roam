@@ -1,10 +1,10 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
     "module": "NodeNext",
     "moduleResolution": "nodenext",
@@ -17,7 +17,15 @@
       "@screens/*": ["./src/screens/*"],
       "@components/*": ["./src/components/*"],
       "@utils/*": ["./src/utils/*"]
-    }
+    },
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "metro.config.js", "App.tsx"],
   "exclude": ["node_modules", "metro.config.js"]

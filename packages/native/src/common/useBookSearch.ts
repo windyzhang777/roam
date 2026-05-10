@@ -78,7 +78,7 @@ export function useBookSearch(
     setTimeout(() => {
       searchInputRef.current?.blur();
     }, 100);
-    focusBody();
+    // focusBody();
   }, [onCloseSearch]);
 
   const clearSearch = useCallback(() => {
@@ -109,8 +109,8 @@ export function useBookSearch(
       }
     };
 
-    window.addEventListener('keydown', handleGlobalKeyDown);
-    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+    // window.addEventListener('keydown', handleGlobalKeyDown);
+    // return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, [clearSearch, openSearch]);
 
   return { loading, searchInputRef, searchText, setSearchText, searchRes, currentMatch, clickMatch, prevMatch, nextMatch, openSearch, closeSearch };

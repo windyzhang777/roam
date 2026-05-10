@@ -1,4 +1,4 @@
-import { PAGE_SIZE, type Book } from '@audiobook/shared';
+import { PAGE_SIZE, PageView, type Book } from '@audiobook/shared';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from 'react-native';
 import { useAnimationFrame } from './useAnimationFrame';
@@ -6,12 +6,18 @@ import useTimer from './useTimer';
 
 export type ScrollMode = 'user' | 'search' | 'tts';
 
+interface useBookNavigationOptions {
+  goToLineRef: React.RefObject<((lineIndex: number) => void | null) | null>;
+}
+
 export default function useBookNavigation(
+  loading: boolean,
   currentLine: number,
   lines: string[],
   loadMoreLines: (offset?: number, limit?: number) => Promise<void>,
   canFetch: boolean,
   isFetchingRef: RefObject<boolean>,
+  options: useBookNavigationOptions,
 ) {
   const [viewLine, setViewLine] = useState<Book['currentLine']>(0);
   const [isCurrentLineVisible, setIsCurrentLineVisible] = useState(false);
@@ -46,7 +52,6 @@ export default function useBookNavigation(
     console.log(`ttsScroll`);
     isUserScrollRef.current = false;
     setIsCurrentLineVisible(true);
-    // focusBody();
   }, []);
 
   const userJump = useCallback(() => {
@@ -56,16 +61,22 @@ export default function useBookNavigation(
 
   const scrollToLine = useCallback(
     (index: number, animated: boolean = true) => {
+      if (options?.goToLineRef.current) {
+        options.goToLineRef.current(index);
+        return;
+      }
+
       const pos = linePositionRef.current[index];
       if (!pos || scrollViewHeight <= 0) return;
 
       const centeredY = pos.y + pos.height / 2 - scrollViewHeight / 2;
       scrollViewRef.current?.scrollTo({ y: Math.max(0, centeredY), animated });
     },
-    [scrollViewHeight],
+    [scrollViewHeight, options],
   );
 
   const jumpToRead = (index: number) => {
+    console.log(`jumpToRead`);
     scrollToLine(index);
     if (viewLineRef.current !== index) updateViewLine(index);
     ttsScroll();
@@ -73,6 +84,7 @@ export default function useBookNavigation(
 
   const jumpToIndex = async (index: number | undefined, shouldRead: boolean = false) => {
     if (index === undefined) return;
+    console.log(`jumpToIndex`);
 
     if (index >= lines.length) {
       await loadMoreLines(0, index + PAGE_SIZE);
@@ -132,6 +144,7 @@ export default function useBookNavigation(
 
   // tts autoscroll
   useEffect(() => {
+    if (loading) return;
     const isVisible = updateIsCurrentLineVisible();
     if (isUserScrollRef.current || isVisible || scrollViewHeight === 0 || contentHeight === 0) return;
     scrollToLine(currentLine, false);
@@ -140,28 +153,28 @@ export default function useBookNavigation(
     if (!isSearchJumpingRef.current) {
       updateViewLine(viewLineRef.current);
     }
-  }, [updateIsCurrentLineVisible, scrollViewHeight, contentHeight, currentLine, scrollToLine, updateViewLine]);
+  }, [loading, updateIsCurrentLineVisible, scrollViewHeight, contentHeight, currentLine, scrollToLine, updateViewLine]);
 
   // update line visibility on lines change
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
+  // useEffect(() => {
+  //   const scroller = scrollerRef.current;
+  //   if (!scroller) return;
 
-    let rafId: number | null = null;
-    const onScroll = () => {
-      if (rafId) return;
-      rafId = requestAnimationFrame(() => {
-        rafId = null;
-        updateIsCurrentLineVisible();
-      });
-    };
+  //   let rafId: number | null = null;
+  //   const onScroll = () => {
+  //     if (rafId) return;
+  //     rafId = requestAnimationFrame(() => {
+  //       rafId = null;
+  //       updateIsCurrentLineVisible();
+  //     });
+  //   };
 
-    scroller.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      scroller.removeEventListener('scroll', onScroll);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, [updateIsCurrentLineVisible]);
+  //   scroller.addEventListener('scroll', onScroll, { passive: true });
+  //   return () => {
+  //     scroller.removeEventListener('scroll', onScroll);
+  //     if (rafId) cancelAnimationFrame(rafId);
+  //   };
+  // }, [updateIsCurrentLineVisible]);
 
   return {
     viewLine,

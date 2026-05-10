@@ -1,7 +1,8 @@
 import { VOICE_FALLBACK, type VoiceOption } from '@/common/useBookSettings';
-import type { ReadingMode } from '@/pages/BookReader';
 import type { Book, BookContent, BookMark, BookSetting, Chapter, HighLight, SearchMatch } from '@audiobook/shared';
 import { createContext, useContext, type Dispatch, type RefObject, type SetStateAction } from 'react';
+
+export type ReadingMode = 'tts' | 'search' | 'edit';
 
 // CommonContext
 interface ICommonContext {
@@ -180,6 +181,7 @@ interface ISettingContext extends Omit<BookSetting, 'bookId' | 'audioPath' | 'pi
   setParagraphSpacing: Dispatch<SetStateAction<BookSetting['paragraphSpacing']>>;
   setIndent: Dispatch<SetStateAction<BookSetting['indent']>>;
   setAlignment: Dispatch<SetStateAction<BookSetting['alignment']>>;
+  setPageView: Dispatch<SetStateAction<BookSetting['pageView']>>;
   availableVoices: VoiceOption[];
 }
 const defaultSettingContext: ISettingContext = {
@@ -197,6 +199,8 @@ const defaultSettingContext: ISettingContext = {
   setIndent: () => {},
   alignment: 'left',
   setAlignment: () => {},
+  pageView: 'scroll',
+  setPageView: () => {},
   availableVoices: [],
 };
 export const SettingContext = createContext<ISettingContext>(defaultSettingContext);
@@ -221,6 +225,8 @@ export const useSettingContext = () => {
     setIndent: settingContext.setIndent,
     alignment: settingContext.alignment,
     setAlignment: settingContext.setAlignment,
+    pageView: settingContext.pageView,
+    setPageView: settingContext.setPageView,
     availableVoices: settingContext.availableVoices,
   };
 };

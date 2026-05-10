@@ -1,5 +1,4 @@
 import { api } from '@/services/api';
-import { speechService } from '@/services/speechService';
 import {
   ALIGNMENT_DEFAULT,
   FONT_SIZE_DEFAULT,
@@ -32,14 +31,16 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
   const [paragraphSpacing, setParagraphSpacing] = useState<NonNullable<BookSetting['paragraphSpacing']>>();
   const [indent, setIndent] = useState<NonNullable<BookSetting['indent']>>();
   const [alignment, setAlignment] = useState<NonNullable<BookSetting['alignment']>>();
+  const [pageView, setPageView] = useState<NonNullable<BookSetting['pageView']>>();
   const [voice, setVoice] = useState<VoiceOption['id']>(VOICE_FALLBACK.id);
 
   const availableVoices = useMemo(() => {
     if (!lang) return [VOICE_FALLBACK];
-    const nativeVoices = speechService.getNativeVoices(lang);
-    const nativeOptions: VoiceOption[] = nativeVoices.map((voice) => ({ type: 'system', id: voice.name, displayName: voice.name, enabled: true }));
-    const cloudOptions: VoiceOption[] = [{ type: 'cloud', id: 'google-neural2', displayName: 'Google AI (Neural2)', enabled: false }];
-    return [...(nativeOptions.length > 0 ? nativeOptions : [VOICE_FALLBACK]), ...cloudOptions];
+    // const nativeVoices = speechService.getNativeVoices(lang);
+    // const nativeOptions: VoiceOption[] = nativeVoices.map((voice) => ({ type: 'system', id: voice.name, displayName: voice.name, enabled: true }));
+    // const cloudOptions: VoiceOption[] = [{ type: 'cloud', id: 'google-neural2', displayName: 'Google AI (Neural2)', enabled: false }];
+    // return [...(nativeOptions.length > 0 ? nativeOptions : [VOICE_FALLBACK]), ...cloudOptions];
+    return [];
   }, [lang]);
 
   const selectedVoice = useMemo(() => {
@@ -48,8 +49,8 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
   }, [availableVoices, voice]);
 
   const updates: Partial<BookSetting> = useMemo(
-    () => ({ fontSize, rate, voice: selectedVoice.id, lineHeight, paragraphSpacing, indent, alignment }),
-    [alignment, fontSize, lineHeight, paragraphSpacing, indent, rate, selectedVoice.id],
+    () => ({ fontSize, rate, voice: selectedVoice.id, lineHeight, paragraphSpacing, indent, alignment, pageView }),
+    [fontSize, lineHeight, paragraphSpacing, indent, alignment, pageView, rate, selectedVoice.id],
   );
 
   const canUpdate =
@@ -63,6 +64,7 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
         paragraphSpacing: setting?.paragraphSpacing,
         indent: setting?.indent,
         alignment: setting?.alignment,
+        pageView: setting?.pageView,
       });
 
   const updateBookSetting = async (_id: string, updates: Partial<BookSetting>) => {
@@ -93,6 +95,7 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
         setParagraphSpacing(() => setting.paragraphSpacing || PARAGRAPH_SPACING_DEFAULT);
         setIndent(() => setting.indent || INDENT_DEFAULT);
         setAlignment(() => setting.alignment || ALIGNMENT_DEFAULT);
+        setPageView(() => setting.pageView || 'single');
       } catch (error) {
         console.error('❌ Failed to load setting: ', error);
       } finally {
@@ -119,6 +122,8 @@ export function useReaderSettings(_id: string | undefined, lang: string | undefi
     setIndent,
     alignment,
     setAlignment,
+    pageView,
+    setPageView,
 
     flushSetting,
     availableVoices,

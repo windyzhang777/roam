@@ -1,5 +1,4 @@
 import { useDebounceCallback } from '@/common/useDebounceCallback';
-import { focusBody } from '@/utils';
 import { FIVE_MINUTES } from '@audiobook/shared';
 import { useEffect } from 'react';
 
@@ -17,17 +16,17 @@ export function useBookUpdate<T>(_id: string | undefined, updates: T, canUpdate:
   useEffect(() => {
     const handlePageExit = () => {
       flushUpdate();
-      focusBody();
+      // focusBody();
     };
 
-    document.addEventListener('visibilitychange', handlePageExit);
-    window.addEventListener('beforeunload', handlePageExit);
-    window.addEventListener('pagehide', handlePageExit);
+    // document.addEventListener('visibilitychange', handlePageExit);
+    // window.addEventListener('beforeunload', handlePageExit);
+    // window.addEventListener('pagehide', handlePageExit);
 
     return () => {
-      document.removeEventListener('visibilitychange', handlePageExit);
-      window.removeEventListener('beforeunload', handlePageExit);
-      window.removeEventListener('pagehide', handlePageExit);
+      // document.removeEventListener('visibilitychange', handlePageExit);
+      // window.removeEventListener('beforeunload', handlePageExit);
+      // window.removeEventListener('pagehide', handlePageExit);
       flushUpdate();
     };
   }, [flushUpdate]);
