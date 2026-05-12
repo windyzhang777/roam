@@ -144,7 +144,7 @@ const BookLine_ = ({ index, line }: BookLineProps) => {
           title={isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'}
           className={cn('w-6 h-6 absolute right-0 bottom-0 bg-transparent hover:bg-transparent', 'opacity-0 hover:opacity-100', isBookmarked ? 'opacity-100' : 'group-hover:opacity-60')}
         >
-          <Bookmark strokeWidth={1} className={cn('fill-primary stroke-primary block', isBookmarked && 'shake-active')} />
+          <Bookmark strokeWidth={1} className={cn('fill-primary stroke-primary block', isBookmarked && 'animate-shake')} />
         </Button>
       )}
     </li>

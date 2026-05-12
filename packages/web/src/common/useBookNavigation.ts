@@ -1,6 +1,6 @@
 import { focusBody } from '@/utils';
 import { PAGE_SIZE, type Book, type PageView } from '@audiobook/shared';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type LocationOptions, type VirtuosoHandle } from 'react-virtuoso';
 import { useAnimationFrame } from './useAnimationFrame';
 import useTimer from './useTimer';
@@ -20,13 +20,15 @@ export default function useBookNavigation(
   options: useBookNavigationOptions,
 ) {
   const [viewLine, setViewLine] = useState<Book['currentLine']>(0);
-  const [isCurrentLineVisible, setIsCurrentLineVisible] = useState(false);
+  const [visibleRange, setVisibleRange] = useState({ startIndex: 0, endIndex: 0 });
+  const isCurrentLineVisible = useMemo(() => currentLine >= visibleRange.startIndex && currentLine <= visibleRange.endIndex, [currentLine, visibleRange]);
+  const currentLineDirection = useMemo((): 'up' | 'down' => (currentLine < visibleRange.startIndex ? 'up' : 'down'), [currentLine, visibleRange]);
 
   const { startTimer } = useTimer();
   const { startAnimationFrame } = useAnimationFrame();
 
   const viewLineRef = useRef(viewLine);
-  const isCurrentLineVisibleRef = useRef(false);
+  const visibleRangeRef = useRef(visibleRange);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const scrollerRef = useRef<HTMLElement | null>(null);
   const isSearchJumpingRef = useRef(false);
@@ -46,7 +48,6 @@ export default function useBookNavigation(
   const ttsScroll = useCallback(() => {
     console.log(`ttsScroll`);
     isUserScrollRef.current = false;
-    setIsCurrentLineVisible(true);
     focusBody();
   }, []);
 
@@ -56,17 +57,45 @@ export default function useBookNavigation(
     startTimer(() => (isSearchJumpingRef.current = false), 300);
   }, [startTimer]);
 
-  const checkLineVisibility = useCallback((index: number) => {
+  const updateVisibleRange = useCallback(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
 
-    const target = scroller.querySelector(`[data-item-index="${index}"]`);
-    if (!target) return false;
-
     const scrollerRect = scroller.getBoundingClientRect();
-    const itemRect = target.getBoundingClientRect();
-    const isVisible = itemRect.top >= scrollerRect.top && itemRect.bottom <= scrollerRect.bottom;
-    return isVisible;
+    const items = scroller.querySelectorAll('[data-item-index]');
+    if (items.length === 0) return;
+
+    let startIndex = -1;
+    let endIndex = -1;
+
+    for (let i = 0; i < items.length; i++) {
+      const rect = items[i].getBoundingClientRect();
+      if (rect.top >= scrollerRect.top && rect.bottom <= scrollerRect.bottom) {
+        startIndex = Number(items[i].getAttribute('data-item-index'));
+        break;
+      }
+    }
+
+    for (let i = items.length - 1; i >= 0; i--) {
+      const rect = items[i].getBoundingClientRect();
+      if (rect.top >= scrollerRect.top && rect.bottom <= scrollerRect.bottom) {
+        endIndex = Number(items[i].getAttribute('data-item-index'));
+        break;
+      }
+    }
+
+    if (startIndex === -1 || endIndex === -1) return;
+    const prev = visibleRangeRef.current;
+    if (prev.startIndex !== startIndex || prev.endIndex !== endIndex) {
+      const next = { startIndex, endIndex };
+      visibleRangeRef.current = next;
+      setVisibleRange(next);
+    }
+  }, []);
+
+  const isLineVisible = useCallback((index: number) => {
+    const { startIndex, endIndex } = visibleRangeRef.current;
+    return index >= startIndex && index <= endIndex;
   }, []);
 
   const scrollToLine = useCallback(
@@ -75,12 +104,12 @@ export default function useBookNavigation(
         options.goToLineRef.current(index);
         return;
       }
-      const isVisible = checkLineVisibility(index);
+      const isVisible = isLineVisible(index);
       if (isVisible) return;
       console.log(`scrollToLine :`, index, behavior);
       startTimer(() => virtuosoRef.current?.scrollToIndex({ index, align: 'start', behavior, offset: -20 }), 100);
     },
-    [startTimer, checkLineVisibility],
+    [startTimer, isLineVisible],
   );
 
   const jumpToRead = (index: number) => {
@@ -106,20 +135,10 @@ export default function useBookNavigation(
     if (viewLineRef.current !== index) updateViewLine(index);
   };
 
-  const updateIsCurrentLineVisible = useCallback(() => {
-    const isVisible = checkLineVisibility(currentLine);
-    const next = isVisible || false;
-    if (next !== isCurrentLineVisibleRef.current) {
-      isCurrentLineVisibleRef.current = next;
-      setIsCurrentLineVisible(next);
-    }
-    return isVisible;
-  }, [checkLineVisibility, currentLine]);
-
   // tts autoscroll
   useEffect(() => {
     if (loading) return;
-    const isVisible = updateIsCurrentLineVisible();
+    const isVisible = isLineVisible(currentLine);
     if (isUserScrollRef.current || isVisible) return;
     scrollToLine(currentLine, 'smooth');
 
@@ -127,9 +146,9 @@ export default function useBookNavigation(
     if (!isSearchJumpingRef.current) {
       updateViewLine(viewLineRef.current);
     }
-  }, [loading, updateIsCurrentLineVisible, currentLine, scrollToLine, updateViewLine]);
+  }, [loading, isLineVisible, currentLine, scrollToLine, updateViewLine]);
 
-  // update line visibility on lines change
+  // update visible range on scroll
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
@@ -139,7 +158,7 @@ export default function useBookNavigation(
       if (rafId) return;
       rafId = requestAnimationFrame(() => {
         rafId = null;
-        updateIsCurrentLineVisible();
+        updateVisibleRange();
       });
     };
 
@@ -148,13 +167,14 @@ export default function useBookNavigation(
       scroller.removeEventListener('scroll', onScroll);
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [updateIsCurrentLineVisible]);
+  }, [loading, updateVisibleRange]);
 
   return {
     viewLine,
     updateViewLine,
     viewLineRef,
     isCurrentLineVisible,
+    currentLineDirection,
     virtuosoRef,
     scrollerRef,
     isSearchJumpingRef,

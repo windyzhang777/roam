@@ -79,8 +79,8 @@ describe('<BookList />', () => {
     fireEvent.click(bookItem);
 
     // Verify Reset + Delete button have the shake class
-    expect(resetBtn.className).toContain('shake-active');
-    expect(deleteBtn.className).toContain('shake-active');
+    expect(resetBtn.className).toContain('animate-shake');
+    expect(deleteBtn.className).toContain('animate-shake');
   });
 
   it('calls reset API and refreshes list on handleReset', async () => {

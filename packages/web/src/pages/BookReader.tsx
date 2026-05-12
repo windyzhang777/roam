@@ -16,7 +16,7 @@ import { BookScrollView } from '@/pages/BookScrollView';
 import { wordHighlightStore } from '@/stores/wordHighlightStore';
 import { focusBody, getChapterIndex } from '@/utils';
 import { bookTitleWithAuthor, type BookMark } from '@audiobook/shared';
-import { ChevronRight, Loader } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -95,6 +95,7 @@ export const BookReader = () => {
     updateViewLine,
     viewLineRef,
     isCurrentLineVisible,
+    currentLineDirection,
     virtuosoRef,
     scrollerRef,
     isSearchJumpingRef,
@@ -359,6 +360,7 @@ export const BookReader = () => {
                     {book.lastReadAt && !isCurrentLineVisible && lines[currentLine] && (
                       <ActiveWordIndicator
                         line={lines[currentLine]}
+                        direction={currentLineDirection}
                         onClick={() => {
                           jumpToRead(currentLineRef.current);
                           if (!isPlaying) play(currentLineRef.current);
@@ -401,19 +403,25 @@ export const BookReader = () => {
   );
 };
 
-const ActiveWordIndicator = ({ line, onClick }: { line: string; onClick: () => void }) => {
+const ActiveWordIndicator = ({ line, direction, onClick }: { line: string; direction: 'up' | 'down'; onClick: () => void }) => {
   const activeWord = useSyncExternalStore(wordHighlightStore.subscribe, wordHighlightStore.getActiveWord);
   const hasActive = activeWord && activeWord.charIndex >= 0;
   const word = hasActive && activeWord ? line.slice(activeWord.charIndex, activeWord.charIndex + activeWord.charLength) : line.slice(0, 5);
+  const Icon = direction === 'up' ? ChevronUp : ChevronDown;
 
   return (
     <Button
       variant="ghost"
       id="indicator-message"
       onClick={onClick}
-      className={cn('z-20 p-2 truncate absolute top-25 left-1/2 -translate-x-1/2 px-4 py-1 text-sm justify-start bg-highlight', 'opacity-20 hover:opacity-100 transition-opacity duration-300')}
+      className={cn(
+        'z-20 p-2 truncate absolute left-1/2 -translate-x-1/2 px-4 py-1 text-sm justify-start bg-highlight hover:bg-highlight',
+        // 'opacity-20 hover:opacity-100 transition-opacity duration-300',
+        'animate-in fade-in duration-500',
+        direction === 'up' ? 'top-25 slide-in-from-top-8' : 'bottom-40 slide-in-from-bottom-8',
+      )}
     >
-      <ChevronRight size={12} />
+      <Icon size={12} />
       <mark className="rounded-md outline-none bg-primary">{word}</mark>
     </Button>
   );
