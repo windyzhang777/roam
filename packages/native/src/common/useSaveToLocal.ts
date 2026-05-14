@@ -1,5 +1,5 @@
 import { api } from '@/services/api';
-import { ALL_LINES, type BookMark, type Chapter } from '@audiobook/shared';
+import { ALL_LINES, type BookMark, type Chapter } from '@roam/shared';
 
 const localKey = (title: string, type: string) => `${title}:${type}`;
 

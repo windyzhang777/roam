@@ -1,6 +1,6 @@
 import useBookPagination from '@/common/useBookPagination';
 import { useBookContext, useContentContext, useSettingContext } from '@/config/contexts';
-import { DELETE_MARKER, FONT_SIZE_DEFAULT, IMAGE_MARKER, INDENT_DEFAULT, LINE_HEIGHT_DEFAULT } from '@audiobook/shared';
+import { DELETE_MARKER, FONT_SIZE_DEFAULT, IMAGE_MARKER, INDENT_DEFAULT, LINE_HEIGHT_DEFAULT } from '@roam/shared';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, LayoutChangeEvent, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useThemeContext } from './theme-provider';

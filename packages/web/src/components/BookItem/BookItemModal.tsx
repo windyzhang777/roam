@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { type Book } from '@audiobook/shared';
+import { type Book } from '@roam/shared';
 import { Trash2 } from 'lucide-react';
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 

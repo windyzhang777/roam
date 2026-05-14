@@ -3,7 +3,7 @@ import { useBookContext, useCommonContext, useSettingContext } from '@/config/co
 import { cn } from '@/lib/utils';
 import { paginationStore } from '@/stores/paginationStore';
 import { getChapter } from '@/utils';
-import { calculateProgress } from '@audiobook/shared';
+import { calculateProgress } from '@roam/shared';
 import { Pause, Play, RotateCcw, RotateCw } from 'lucide-react';
 import { useSyncExternalStore, type SetStateAction } from 'react';
 import { RateContextMenu, VoiceContextMenu } from './BookControlContextMenu';

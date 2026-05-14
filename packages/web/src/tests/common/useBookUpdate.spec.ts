@@ -1,6 +1,6 @@
 import { useBookUpdate } from '@/common/useBookUpdate';
 import { api } from '@/services/api';
-import { FIVE_MINUTES } from '@audiobook/shared';
+import { FIVE_MINUTES } from '@roam/shared';
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

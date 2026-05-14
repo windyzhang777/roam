@@ -1,4 +1,4 @@
-import { getNowISOString, type SpeechOptions } from '@audiobook/shared';
+import { getNowISOString, type SpeechOptions } from '@roam/shared';
 import type { SpeechStatus } from './speechService';
 
 export interface TTSConfigs extends Omit<SpeechOptions, 'voice'> {

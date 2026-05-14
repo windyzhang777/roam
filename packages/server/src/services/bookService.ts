@@ -16,7 +16,7 @@ import {
   PAGE_VIEW_DEFAULT,
   RATE_DEFAULT,
   SearchMatch,
-} from '@audiobook/shared';
+} from '@roam/shared';
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';

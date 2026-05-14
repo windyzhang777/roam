@@ -6,7 +6,7 @@ import * as React from 'react';
 import { useBookContext, useCommonContext, useViewLineContext } from '@/config/contexts';
 import { cn } from '@/lib/utils';
 import { getChapter } from '@/utils';
-import { calculateProgress } from '@audiobook/shared';
+import { calculateProgress } from '@roam/shared';
 import { useState } from 'react';
 
 function Slider({ id, className, defaultValue, value, min = 0, max = 100, ...props }: React.ComponentProps<typeof SliderPrimitive.Root>) {

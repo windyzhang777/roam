@@ -1,4 +1,4 @@
-import { DELETE_MARKER, FONT_SIZE_DEFAULT, IMAGE_MARKER, INDENT_DEFAULT, LINE_HEIGHT_DEFAULT, PARAGRAPH_SPACING_DEFAULT, type PageView } from '@audiobook/shared';
+import { DELETE_MARKER, FONT_SIZE_DEFAULT, IMAGE_MARKER, INDENT_DEFAULT, LINE_HEIGHT_DEFAULT, PARAGRAPH_SPACING_DEFAULT, type PageView } from '@roam/shared';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounceCallback } from './useDebounceCallback';
 

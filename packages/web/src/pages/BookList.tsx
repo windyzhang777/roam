@@ -10,7 +10,7 @@ import { BookItemScraping } from '@/components/BookItem/BookItemScraping';
 import { useThemeContext } from '@/components/theme-provider';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { FEATURES } from '@/config/features';
-import { getBookActionLabel, type Book } from '@audiobook/shared';
+import { getBookActionLabel, type Book } from '@roam/shared';
 import { BookOpen, ChevronDown, ChevronUp, CirclePlus, Cloudy, Loader, Moon, Sun } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

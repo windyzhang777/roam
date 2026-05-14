@@ -1,7 +1,7 @@
 {
-  "name": "@audiobook/server",
+  "name": "@roam/server",
   "version": "1.0.0",
-  "description": "audiobook-app server",
+  "description": "roam server",
   "main": "dist/index.js",
   "scripts": {
     "dev": "NODE_ENV=development tsx watch src/index.ts",
@@ -10,7 +10,7 @@
     "lint": "eslint src --ext .ts"
   },
   "dependencies": {
-    "@audiobook/shared": "workspace:*",
+    "@roam/shared": "workspace:*",
     "@google-cloud/text-to-speech": "^6.4.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",

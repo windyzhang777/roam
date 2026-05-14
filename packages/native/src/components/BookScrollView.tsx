@@ -1,5 +1,5 @@
 import { useBookContext, useContentContext } from '@/config/contexts';
-import { DELETE_MARKER, IMAGE_MARKER } from '@audiobook/shared';
+import { DELETE_MARKER, IMAGE_MARKER } from '@roam/shared';
 import React from 'react';
 import { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useThemeContext } from './theme-provider';

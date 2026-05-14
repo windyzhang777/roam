@@ -1,6 +1,6 @@
 import { api } from '@/services/api';
 import type { ChunkedUploader } from '@/services/chunkedUploader';
-import { type Book, type UploadProgress } from '@audiobook/shared';
+import { type Book, type UploadProgress } from '@roam/shared';
 import { useCallback, useRef, useState } from 'react';
 
 export type UploadStatus = 'uploading' | 'completed' | 'error' | 'cancelled';

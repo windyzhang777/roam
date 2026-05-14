@@ -1,5 +1,5 @@
 {
-  "name": "@audiobook/web",
+  "name": "@roam/web",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
     "test:run": "vitest run"
   },
   "dependencies": {
-    "@audiobook/shared": "workspace:*",
+    "@roam/shared": "workspace:*",
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/montserrat": "^5.2.8",
     "@fontsource-variable/noto-sans": "^5.2.10",

@@ -4,7 +4,7 @@ import { Slider } from '@/components/ui/slider';
 import { useBookContext, useCommonContext, useContentContext, useSearchContext, useViewLineContext } from '@/config/contexts';
 import { FEATURES } from '@/config/features';
 import { focusBody } from '@/utils';
-import { bookTitleWithAuthor } from '@audiobook/shared';
+import { bookTitleWithAuthor } from '@roam/shared';
 import { ArrowBigDown, ArrowBigUp, Bookmark, Fullscreen, LibraryBig, ListEnd, ListStart, Loader, Minus, Plus, Search, Settings, X } from 'lucide-react';
 import { type SetStateAction } from 'react';
 

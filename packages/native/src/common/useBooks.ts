@@ -1,5 +1,5 @@
 import { api } from '@/services/api';
-import { type Book } from '@audiobook/shared';
+import { type Book } from '@roam/shared';
 import { useCallback, useEffect, useState } from 'react';
 
 export function useBooks() {

@@ -1,16 +1,6 @@
 import { api } from '@/services/api';
 import { speechService } from '@/services/speechService';
-import {
-  ALIGNMENT_DEFAULT,
-  FONT_SIZE_DEFAULT,
-  INDENT_DEFAULT,
-  LINE_HEIGHT_DEFAULT,
-  PARAGRAPH_SPACING_DEFAULT,
-  RATE_DEFAULT,
-  type BookSetting,
-  type SpeechOptions,
-  type VoiceType,
-} from '@audiobook/shared';
+import { ALIGNMENT_DEFAULT, FONT_SIZE_DEFAULT, INDENT_DEFAULT, LINE_HEIGHT_DEFAULT, PARAGRAPH_SPACING_DEFAULT, RATE_DEFAULT, type BookSetting, type SpeechOptions, type VoiceType } from '@roam/shared';
 import { useEffect, useMemo, useState } from 'react';
 import { useBookUpdate } from './useBookUpdate';
 

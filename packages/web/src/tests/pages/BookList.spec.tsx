@@ -1,6 +1,6 @@
 import { BookList } from '@/pages/BookList';
 import { api } from '@/services/api';
-import type { Book } from '@audiobook/shared';
+import type { Book } from '@roam/shared';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';

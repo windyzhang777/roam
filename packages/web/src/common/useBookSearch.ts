@@ -1,7 +1,7 @@
 import { useDebounceCallback } from '@/common/useDebounceCallback';
 import { api } from '@/services/api';
 import { focusBody } from '@/utils';
-import { type SearchMatch } from '@audiobook/shared';
+import { type SearchMatch } from '@roam/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useBookSearch(

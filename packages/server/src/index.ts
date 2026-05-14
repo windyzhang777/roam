@@ -68,12 +68,12 @@ export default app;
 // Start server
 const startServer = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/audiobook-app');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/roam');
     console.log('✅ MongoDB connected');
 
     if (process.env.NODE_ENV !== 'production') {
       app.listen(PORT, () => {
-        console.log(`🚀 Audiobook server running on http://localhost:${PORT}`);
+        console.log(`🚀 Roam server running on http://localhost:${PORT}`);
       });
     }
   } catch (error) {

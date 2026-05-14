@@ -1,4 +1,4 @@
-import { BookSetting, ChunkedUploadConfig, SearchMatch, type Book, type BookContentPaginated } from '@audiobook/shared';
+import { BookSetting, ChunkedUploadConfig, SearchMatch, type Book, type BookContentPaginated } from '@roam/shared';
 import { DocumentPickerAsset } from 'expo-document-picker';
 import EventSource from 'react-native-sse';
 import { ChunkedUploader } from './ChunkedUploader';

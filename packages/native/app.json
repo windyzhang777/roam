@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Audiobook Reader",
-    "slug": "audiobook-native",
+    "name": "Roam",
+    "slug": "roam",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

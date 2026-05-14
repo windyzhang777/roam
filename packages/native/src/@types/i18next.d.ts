@@ -1,4 +1,4 @@
-import { TranslationSchema } from '@audiobook/shared';
+import { TranslationSchema } from '@roam/shared';
 
 declare module 'i18next' {
   interface CustomTypeOptions {

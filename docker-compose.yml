@@ -15,7 +15,7 @@ services:
   #   ports:
   #     - '3000:3000'
   #   environment:
-  #     - MONGODB_URI=mongodb://mongodb:27017/audiobook-app
+  #     - MONGODB_URI=mongodb://mongodb:27017/roam
   #   depends_on:
   #     - mongodb
 

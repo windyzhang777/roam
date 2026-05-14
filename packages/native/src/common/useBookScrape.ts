@@ -1,5 +1,5 @@
 import { api } from '@/services/api';
-import type { Book, UploadProgress } from '@audiobook/shared';
+import type { Book, UploadProgress } from '@roam/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface ScrapeProgress extends UploadProgress {

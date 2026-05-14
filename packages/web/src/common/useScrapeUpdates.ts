@@ -1,5 +1,5 @@
 import { api } from '@/services/api';
-import { type Book } from '@audiobook/shared';
+import { type Book } from '@roam/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useScrapeUpdates(books: Book[]) {

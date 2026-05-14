@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import type { Book, BookAction } from '@audiobook/shared';
+import type { Book, BookAction } from '@roam/shared';
 import { CircleCheck, CircleMinus, Ellipsis, SquarePen } from 'lucide-react';
 
 interface BookItemContextMenuProps {

@@ -1,6 +1,6 @@
 import { renderDeleteToaster } from '@/components/toaster';
 import { api } from '@/services/api';
-import { DELETE_MARKER, getNowISOString, IMAGE_MARKER, MAX_BOOKMARK_TEXT, PAGE_SIZE, removeMarker, type Book, type BookContent } from '@audiobook/shared';
+import { DELETE_MARKER, getNowISOString, IMAGE_MARKER, MAX_BOOKMARK_TEXT, PAGE_SIZE, removeMarker, type Book, type BookContent } from '@roam/shared';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { triggerSuccess } from './triggerSuccess';
 import { useBookUpdate } from './useBookUpdate';

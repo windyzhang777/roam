@@ -2,7 +2,7 @@ import { useBookContext, useCommonContext, useSearchContext, useSettingContext, 
 import { FEATURES } from '@/config/features';
 import { cn } from '@/lib/utils';
 import { wordHighlightStore, type WordHighlight } from '@/stores/wordHighlightStore';
-import { CHAPTER_MARKER, DELETE_MARKER, escapeRegExp, IMAGE_MARKER, removeMarker } from '@audiobook/shared';
+import { CHAPTER_MARKER, DELETE_MARKER, escapeRegExp, IMAGE_MARKER, removeMarker } from '@roam/shared';
 import { Bookmark } from 'lucide-react';
 import React, { useCallback, useSyncExternalStore } from 'react';
 import { Button } from '../ui/button';

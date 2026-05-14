@@ -1,5 +1,5 @@
 import { useDebounceCallback } from '@/common/useDebounceCallback';
-import { FIVE_MINUTES } from '@audiobook/shared';
+import { FIVE_MINUTES } from '@roam/shared';
 import { useEffect } from 'react';
 
 export function useBookUpdate<T>(_id: string | undefined, updates: T, canUpdate: boolean, onUpdate: (id: string, data: T) => Promise<void>) {

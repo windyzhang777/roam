@@ -1,4 +1,4 @@
-import { Book, BookContent, Chapter, CHAPTER_MARKER, IMAGE_MARKER, localeByLang } from '@audiobook/shared';
+import { Book, BookContent, Chapter, CHAPTER_MARKER, IMAGE_MARKER, localeByLang } from '@roam/shared';
 import chardet from 'chardet';
 import { EPub } from 'epub2';
 import { franc } from 'franc';

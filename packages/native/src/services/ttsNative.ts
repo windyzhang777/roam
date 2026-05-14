@@ -1,4 +1,4 @@
-import { localeByLang, type SpeechOptions } from '@audiobook/shared';
+import { localeByLang, type SpeechOptions } from '@roam/shared';
 import { Audio, InterruptionModeIOS } from 'expo-av';
 import * as ExpoSpeech from 'expo-speech';
 import { Platform } from 'react-native';

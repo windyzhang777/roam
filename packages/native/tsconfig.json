@@ -10,7 +10,7 @@
     "moduleResolution": "nodenext",
     "paths": {
       "@/*": ["./src/*"],
-      "@audiobook/shared": ["../shared/src"],
+      "@roam/shared": ["../shared/src"],
       "@/assets/*": ["./assets/*"],
       "@models/*": ["./src/models/*"],
       "@services/*": ["./src/services/*"],

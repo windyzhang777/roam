@@ -1,5 +1,5 @@
 import { type VoiceOption } from '@/common/useBookSettings';
-import { hasMarker, MAX_BOOKMARK_TEXT, type BookContent, type SpeechOptions } from '@audiobook/shared';
+import { hasMarker, MAX_BOOKMARK_TEXT, type BookContent, type SpeechOptions } from '@roam/shared';
 import { TTSNative } from './ttsNative';
 
 export type SpeechStatus = 'idle' | 'speaking' | 'paused' | 'loading';

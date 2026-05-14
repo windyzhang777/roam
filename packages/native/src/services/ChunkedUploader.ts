@@ -1,4 +1,4 @@
-import { ChunkedUploadConfig, ChunkMetadata, sleep, UPLOAD_CHUNK_SIZE, UploadProgress, type Book } from '@audiobook/shared';
+import { ChunkedUploadConfig, ChunkMetadata, sleep, UPLOAD_CHUNK_SIZE, UploadProgress, type Book } from '@roam/shared';
 import { DocumentPickerAsset } from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import { BASE_URL } from './config';

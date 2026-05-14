@@ -1,4 +1,4 @@
-import { Book, PAGE_SIZE } from '@audiobook/shared';
+import { Book, PAGE_SIZE } from '@roam/shared';
 import { Request, Response } from 'express';
 import { AudiobookService } from '../services/audiobookService';
 import { BookService } from '../services/bookService';

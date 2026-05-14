@@ -1,6 +1,6 @@
 import type { ScrapeProgress } from '@/common/useBookScrape';
 import { ChunkedUploader } from '@/services/chunkedUploader';
-import { type Book, type BookContentPaginated, type BookSetting, type ChunkedUploadConfig, type SearchMatch } from '@audiobook/shared';
+import { type Book, type BookContentPaginated, type BookSetting, type ChunkedUploadConfig, type SearchMatch } from '@roam/shared';
 
 const getErrorMessage = async (response: Response, message?: string): Promise<string> => {
   try {

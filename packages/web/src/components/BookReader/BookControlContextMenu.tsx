@@ -4,7 +4,7 @@ import { Dialog } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Slider } from '@/components/ui/slider';
 import { useContentContext, useSettingContext, useSpeechContext } from '@/config/contexts';
-import { MAX_RATE, MIN_RATE, RATE_DEFAULT, RATE_STEP } from '@audiobook/shared';
+import { MAX_RATE, MIN_RATE, RATE_DEFAULT, RATE_STEP } from '@roam/shared';
 import { Minus, Plus } from 'lucide-react';
 
 interface BookControlContextMenuProps {

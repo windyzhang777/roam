@@ -8,7 +8,7 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "types": ["node"],
-    "paths": { "@/*": ["./src/*", "../shared/src/*"], "@audiobook/shared": ["../shared/src"] },
+    "paths": { "@/*": ["./src/*", "../shared/src/*"], "@roam/shared": ["../shared/src"] },
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
   "include": ["src/**/*"],

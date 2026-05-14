@@ -1,4 +1,4 @@
-import { sleep, UPLOAD_CHUNK_SIZE, type Book, type ChunkedUploadConfig, type ChunkMetadata, type UploadProgress } from '@audiobook/shared';
+import { sleep, UPLOAD_CHUNK_SIZE, type Book, type ChunkedUploadConfig, type ChunkMetadata, type UploadProgress } from '@roam/shared';
 
 export class ChunkedUploader {
   private file: File;

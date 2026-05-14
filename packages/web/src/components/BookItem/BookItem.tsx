@@ -1,6 +1,6 @@
 import { BindingLine, BookItemContextMenu, BookItemPlaceholder } from '@/components/BookItem';
 import { Button } from '@/components/ui/button';
-import { bookTitleWithAuthor, calculateProgress, formatLocaleDateString, type Book, type BookAction } from '@audiobook/shared';
+import { bookTitleWithAuthor, calculateProgress, formatLocaleDateString, type Book, type BookAction } from '@roam/shared';
 import { BadgeCheck, BellRing, CircleChevronRight } from 'lucide-react';
 
 interface BookItemProps {

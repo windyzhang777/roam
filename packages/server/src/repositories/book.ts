@@ -1,4 +1,4 @@
-import { Book, BookContent, BookContentPaginated, BookSetting, Chapter, PAGE_SIZE } from '@audiobook/shared';
+import { Book, BookContent, BookContentPaginated, BookSetting, Chapter, PAGE_SIZE } from '@roam/shared';
 import mongoose, { Schema } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 

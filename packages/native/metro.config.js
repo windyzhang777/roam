@@ -7,7 +7,7 @@ const workspaceRoot = path.resolve(projectRoot, '../..');
 
 const config = getDefaultConfig(projectRoot);
 
-// 2. Watch all files in the monorepo (so changes in @audiobook/shared trigger a reload)
+// 2. Watch all files in the monorepo (so changes in @roam/shared trigger a reload)
 config.watchFolders = [...(config.watchFolders || []), workspaceRoot];
 
 // 3. Force Metro to resolve modules from the workspace root node_modules

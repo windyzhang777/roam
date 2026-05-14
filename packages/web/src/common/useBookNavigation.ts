@@ -1,5 +1,5 @@
 import { focusBody } from '@/utils';
-import { PAGE_SIZE, type Book, type PageView } from '@audiobook/shared';
+import { PAGE_SIZE, type Book, type PageView } from '@roam/shared';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type LocationOptions, type VirtuosoHandle } from 'react-virtuoso';
 import { useAnimationFrame } from './useAnimationFrame';

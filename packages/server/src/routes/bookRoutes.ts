@@ -1,4 +1,4 @@
-import { isValidImageType, MAX_UPLOAD_SIZE } from '@audiobook/shared';
+import { isValidImageType, MAX_UPLOAD_SIZE } from '@roam/shared';
 import { Router } from 'express';
 import multer from 'multer';
 import path from 'path';

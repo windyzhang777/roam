@@ -1,7 +1,7 @@
 import { BookReader } from '@/pages/BookReader';
 import { api } from '@/services/api';
 import { speechService } from '@/services/SpeechService';
-import type { Book, BookContent } from '@audiobook/shared';
+import type { Book, BookContent } from '@roam/shared';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { JSX, ReactNode } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';

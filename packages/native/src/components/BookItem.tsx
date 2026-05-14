@@ -2,7 +2,7 @@ import { ScrapingBook } from '@/common/useBookScrape';
 import { UploadingBook } from '@/common/useBookUpload';
 import { useThemeContext } from '@/components/theme-provider';
 import { BASE_URL } from '@/services/config';
-import { Book, BookAction, calculateProgress, formatLocaleDateString, getBookActionLabel } from '@audiobook/shared';
+import { Book, BookAction, calculateProgress, formatLocaleDateString, getBookActionLabel } from '@roam/shared';
 import { TFunction } from 'i18next';
 import { BadgeCheck, BellRing, CircleChevronRight, CircleMinus } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';

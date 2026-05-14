@@ -31,7 +31,7 @@ import {
   PARAGRAPH_SPACING_STEP,
   removeMarker,
   type BookMark,
-} from '@audiobook/shared';
+} from '@roam/shared';
 import {
   AArrowDown,
   AArrowUp,
@@ -75,7 +75,7 @@ interface SidePanelLeftProps extends BookSidePanelProps {
 
 export const SidePanelLeft = ({ open, onClose, onUpdateBookmark }: SidePanelLeftProps) => {
   const { book, chapters, bookmarks, viewChapter, highlights, setBookmarks, setHighlights, setChapters } = useBookContext();
-  const showChapters = useMemo(() => chapters?.length > 1, [chapters]);
+  const showChapters = useMemo(() => chapters?.length > 0, [chapters]);
   const [index, setIndex] = useState(showChapters ? 0 : 1);
   const [selectedBookmark, setSelectedBookmark] = useState<number>();
   const [selectedHighlight, setSelectedHighlight] = useState<number>();

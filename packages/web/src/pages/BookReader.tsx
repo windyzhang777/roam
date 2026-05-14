@@ -15,7 +15,7 @@ import { BookPageView } from '@/pages/BookPageView';
 import { BookScrollView } from '@/pages/BookScrollView';
 import { wordHighlightStore } from '@/stores/wordHighlightStore';
 import { focusBody, getChapterIndex } from '@/utils';
-import { bookTitleWithAuthor, type BookMark } from '@audiobook/shared';
+import { bookTitleWithAuthor, type BookMark } from '@roam/shared';
 import { ChevronDown, ChevronUp, Loader } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -416,7 +416,7 @@ const ActiveWordIndicator = ({ line, direction, onClick }: { line: string; direc
       onClick={onClick}
       className={cn(
         'z-20 p-2 truncate absolute left-1/2 -translate-x-1/2 px-4 py-1 text-sm justify-start bg-highlight hover:bg-highlight',
-        // 'opacity-20 hover:opacity-100 transition-opacity duration-300',
+        'opacity-20 hover:opacity-100 transition-opacity duration-300',
         'animate-in fade-in duration-500',
         direction === 'up' ? 'top-25 slide-in-from-top-8' : 'bottom-40 slide-in-from-bottom-8',
       )}

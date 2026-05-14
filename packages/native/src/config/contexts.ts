@@ -1,5 +1,5 @@
 import { VOICE_FALLBACK, type VoiceOption } from '@/common/useBookSettings';
-import type { Book, BookContent, BookMark, BookSetting, Chapter, HighLight, SearchMatch } from '@audiobook/shared';
+import type { Book, BookContent, BookMark, BookSetting, Chapter, HighLight, SearchMatch } from '@roam/shared';
 import { createContext, useContext, type Dispatch, type RefObject, type SetStateAction } from 'react';
 
 export type ReadingMode = 'tts' | 'search' | 'edit';

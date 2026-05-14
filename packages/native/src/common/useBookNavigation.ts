@@ -1,4 +1,4 @@
-import { PAGE_SIZE, PageView, type Book } from '@audiobook/shared';
+import { PAGE_SIZE, PageView, type Book } from '@roam/shared';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from 'react-native';
 import { useAnimationFrame } from './useAnimationFrame';

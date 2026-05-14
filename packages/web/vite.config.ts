@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src'),
-        '@audiobook/shared': path.resolve(__dirname, '../shared/src'),
+        '@roam/shared': path.resolve(__dirname, '../shared/src'),
       },
     },
     server: {

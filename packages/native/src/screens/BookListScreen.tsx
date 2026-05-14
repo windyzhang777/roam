@@ -6,7 +6,7 @@ import { useScrapeUpdates } from '@/common/useScrapeUpdates';
 import { BookItem, BookItemScraping, BookItemUploading } from '@/components/BookItem';
 import { ScrapeBookModal } from '@/components/BookItemModal';
 import { useThemeContext } from '@/components/theme-provider';
-import { Book, BookSource, getBookActionLabel } from '@audiobook/shared';
+import { Book, BookSource, getBookActionLabel } from '@roam/shared';
 import { useNavigation } from '@react-navigation/native';
 import { BookOpen, CirclePlus, Cloudy, Moon, Sun } from 'lucide-react-native';
 import { useCallback, useMemo, useRef, useState } from 'react';

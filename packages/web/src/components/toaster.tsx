@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import type { Chapter } from '@audiobook/shared';
+import type { Chapter } from '@roam/shared';
 import { AudioLines, Undo } from 'lucide-react';
 
 export const renderDeleteToaster = (index: number, onClick: () => Promise<void>): React.ReactNode => (

@@ -1,6 +1,6 @@
 import { api } from '@/services/api';
 import { ChunkedUploader } from '@/services/ChunkedUploader';
-import { Book, type UploadProgress } from '@audiobook/shared';
+import { Book, type UploadProgress } from '@roam/shared';
 import * as DocumentPicker from 'expo-document-picker';
 import { useCallback, useRef, useState } from 'react';
 

@@ -1,4 +1,4 @@
-import { DELETE_MARKER, FONT_SIZE_DEFAULT, IMAGE_MARKER, INDENT_DEFAULT, LINE_HEIGHT_DEFAULT, PARAGRAPH_SPACING_DEFAULT } from '@audiobook/shared';
+import { DELETE_MARKER, FONT_SIZE_DEFAULT, IMAGE_MARKER, INDENT_DEFAULT, LINE_HEIGHT_DEFAULT, PARAGRAPH_SPACING_DEFAULT } from '@roam/shared';
 import { useCallback, useMemo, useState } from 'react';
 
 export interface PageBoundary {

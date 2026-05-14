@@ -1,4 +1,4 @@
-import { type Book, type BookAction } from '@audiobook/shared';
+import { type Book, type BookAction } from '@roam/shared';
 import { useState } from 'react';
 
 export function useBookAction() {

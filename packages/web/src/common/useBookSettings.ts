@@ -11,7 +11,7 @@ import {
   type BookSetting,
   type SpeechOptions,
   type VoiceType,
-} from '@audiobook/shared';
+} from '@roam/shared';
 import { useEffect, useMemo, useState } from 'react';
 import { useBookUpdate } from './useBookUpdate';
 

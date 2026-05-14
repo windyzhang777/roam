@@ -1,4 +1,4 @@
-import { voiceByLocale } from '@audiobook/shared';
+import { voiceByLocale } from '@roam/shared';
 import { TextToSpeechClient } from '@google-cloud/text-to-speech';
 import { google } from '@google-cloud/text-to-speech/build/protos/protos';
 

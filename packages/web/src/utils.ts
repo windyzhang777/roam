@@ -1,4 +1,4 @@
-import type { Chapter } from '@audiobook/shared';
+import type { Chapter } from '@roam/shared';
 
 export const getChapterStartIndex = (chapterIndex: number, chapters: Chapter[] | undefined) => {
   if (!chapters || chapters.length <= 1) return undefined;
